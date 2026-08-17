@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/*
+ * Paleta y tipografía del Manual de Marca CAP v1.0 (Marca/CAP_manual_de_marca.pdf).
+ * Reglas de contraste del manual: el Naranja Circuito nunca va como color de
+ * texto sobre fondo claro (Hueso/Naranja = 2.7:1) -- siempre como bloque de
+ * fondo con texto Azul Noche encima. Sobre fondo oscuro sí funciona como texto
+ * (Noche/Naranja = 5.7:1).
+ */
+:root {
+  --color-azul-noche: #0d1b2a;
+  --color-azul-profundo: #16324f;
+  --color-hueso: #f3f0e9;
+  --color-naranja: #ff5c2b;
+  --color-cian: #37c9c2;
+
+  --background: var(--color-hueso);
+  --foreground: var(--color-azul-noche);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-azul-noche: var(--color-azul-noche);
+  --color-azul-profundo: var(--color-azul-profundo);
+  --color-hueso: var(--color-hueso);
+  --color-naranja: var(--color-naranja);
+  --color-cian: var(--color-cian);
+  --font-sans: var(--font-archivo);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
