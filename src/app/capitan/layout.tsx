@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { logout } from "@/app/login/actions";
 
 export default function CapitanLayout({
@@ -13,11 +14,16 @@ export default function CapitanLayout({
           <img src="/isotipo-negativo.svg" alt="CAP" className="h-6" />
           <span className="text-sm font-medium text-hueso">Panel del capitán</span>
         </div>
-        <form action={logout}>
-          <button type="submit" className="text-sm text-hueso/60 hover:text-naranja">
-            Cerrar sesión
-          </button>
-        </form>
+        <div className="flex items-center gap-4">
+          <Link href="/cuenta" className="text-sm text-hueso/60 hover:text-naranja">
+            Cambiar contraseña
+          </Link>
+          <form action={logout}>
+            <button type="submit" className="text-sm text-hueso/60 hover:text-naranja">
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
       </header>
       <main className="flex flex-1 flex-col p-6">{children}</main>
     </div>

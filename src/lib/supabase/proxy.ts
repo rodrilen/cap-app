@@ -32,8 +32,9 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAdminRoute = pathname.startsWith("/admin");
   const isCapitanRoute = pathname.startsWith("/capitan");
+  const isCuentaRoute = pathname.startsWith("/cuenta");
 
-  if (!user && (isAdminRoute || isCapitanRoute)) {
+  if (!user && (isAdminRoute || isCapitanRoute || isCuentaRoute)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", pathname);

@@ -39,11 +39,16 @@ export default function AdminLayout({
             </Link>
           </nav>
         </div>
-        <form action={logout}>
-          <button type="submit" className="text-sm text-hueso/60 hover:text-naranja">
-            Cerrar sesión
-          </button>
-        </form>
+        <div className="flex items-center gap-4">
+          <Link href="/cuenta" className="text-sm text-hueso/60 hover:text-naranja">
+            Cambiar contraseña
+          </Link>
+          <form action={logout}>
+            <button type="submit" className="text-sm text-hueso/60 hover:text-naranja">
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
       </header>
       <main className="flex flex-1 flex-col p-6">{children}</main>
     </div>
