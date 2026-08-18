@@ -43,6 +43,9 @@ export default function AdminLayout({
           </nav>
         </div>
         <div className="flex items-center gap-4">
+          <Link href="/" className="text-sm text-hueso/60 hover:text-naranja">
+            Ver sitio público
+          </Link>
           <Link href="/cuenta" className="text-sm text-hueso/60 hover:text-naranja">
             Cambiar contraseña
           </Link>

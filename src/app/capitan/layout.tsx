@@ -8,11 +8,27 @@ export default function CapitanLayout({
 }) {
   return (
     <div className="flex flex-1 flex-col">
-      <header className="flex items-center justify-between gap-3 bg-azul-noche px-6 py-4">
-        <div className="flex items-center gap-3">
+      <header className="flex flex-wrap items-center justify-between gap-3 bg-azul-noche px-6 py-4">
+        <div className="flex flex-wrap items-center gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/isotipo-negativo.svg" alt="CAP" className="h-6" />
-          <span className="text-sm font-medium text-hueso">Panel del capitán</span>
+          <nav className="flex flex-wrap gap-4 text-sm font-medium text-hueso">
+            <Link href="/capitan" className="hover:text-naranja">
+              Mis partidos
+            </Link>
+            <Link href="/fixture" className="hover:text-naranja">
+              Fixture
+            </Link>
+            <Link href="/tabla" className="hover:text-naranja">
+              Tabla
+            </Link>
+            <Link href="/ranking" className="hover:text-naranja">
+              Rankings
+            </Link>
+            <Link href="/clubes" className="hover:text-naranja">
+              Clubes
+            </Link>
+          </nav>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/cuenta" className="text-sm text-hueso/60 hover:text-naranja">
