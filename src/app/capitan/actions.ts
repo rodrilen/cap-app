@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { notificarResultadoPendiente } from "@/lib/ghl";
 
 // Estas escrituras se hacen con el cliente autenticado del capitán (no
 // admin), a propósito: la policy RLS "capitan local carga resultado" /
@@ -45,7 +47,7 @@ export async function cargarResultado(formData: FormData) {
 
   const setsLocal = partidosIndividuales.filter((p) => p.sets_local > p.sets_visitante).length;
 
-  await supabase
+  const { error: updateError } = await supabase
     .from("partido")
     .update({
       sets_local: setsLocal,
@@ -61,7 +63,53 @@ export async function cargarResultado(formData: FormData) {
     })
     .eq("id", partidoId);
 
+  if (!updateError) {
+    await avisarCapitanVisitante(partidoId);
+  }
+
   revalidatePath("/capitan");
+}
+
+// El capitán local no tiene permiso (por RLS) para leer el email del
+// capitán visitante -- solo puede ver su propia fila de `usuario`. Se usa
+// el cliente admin acá puntualmente para resolver ese email y mandar el
+// aviso por mail vía GHL, además del aviso in-app que ya crea el trigger
+// de Postgres.
+async function avisarCapitanVisitante(partidoId: string) {
+  const admin = createAdminClient();
+
+  const { data: partido } = await admin
+    .from("partido")
+    .select(
+      "equipo_local:equipo_local_id (nombre), equipo_visitante:equipo_visitante_id (id, nombre)",
+    )
+    .eq("id", partidoId)
+    .single();
+
+  const equipoVisitante = partido?.equipo_visitante as unknown as {
+    id: string;
+    nombre: string;
+  } | null;
+  if (!equipoVisitante) return;
+
+  const { data: capitanVisitante } = await admin
+    .from("usuario")
+    .select("email")
+    .eq("equipo_id", equipoVisitante.id)
+    .eq("rol", "capitan")
+    .maybeSingle();
+
+  if (!capitanVisitante?.email) return;
+
+  const equipoLocal = partido?.equipo_local as unknown as { nombre: string } | null;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+  await notificarResultadoPendiente({
+    email: capitanVisitante.email,
+    equipoLocalNombre: equipoLocal?.nombre ?? "",
+    equipoVisitanteNombre: equipoVisitante.nombre,
+    urlPanel: `${siteUrl}/capitan`,
+  });
 }
 
 export async function confirmarResultado(formData: FormData) {
