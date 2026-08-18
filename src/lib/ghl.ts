@@ -84,3 +84,36 @@ export async function notificarResultadoPendiente({
     console.error("No se pudo enviar el email de notificación vía GHL:", err);
   }
 }
+
+// Aviso al admin cuando un capitán visitante disputa un resultado. Mismo
+// criterio que arriba: si GHL falla, no bloquea la disputa -- el partido ya
+// quedó marcado "disputado" y visible en /admin/partidos de todas formas.
+export async function notificarDisputa({
+  email,
+  equipoLocalNombre,
+  equipoVisitanteNombre,
+  fechaNumero,
+  urlAdmin,
+}: {
+  email: string;
+  equipoLocalNombre: string;
+  equipoVisitanteNombre: string;
+  fechaNumero: number;
+  urlAdmin: string;
+}) {
+  try {
+    const contactId = await upsertContacto(email);
+    await enviarEmail(
+      contactId,
+      `CAP: disputa en Fecha ${fechaNumero} — ${equipoLocalNombre} vs ${equipoVisitanteNombre}`,
+      `<p>Hola,</p>
+       <p>El capitán de <strong>${equipoVisitanteNombre}</strong> disputó el resultado cargado por
+       <strong>${equipoLocalNombre}</strong> en la Fecha ${fechaNumero}.</p>
+       <p>Entrá al panel para resolverlo (forzar confirmación, corregir el resultado o marcar walkover):</p>
+       <p><a href="${urlAdmin}">${urlAdmin}</a></p>
+       <p>— CAP, Circuito Abierto de Pádel</p>`,
+    );
+  } catch (err) {
+    console.error("No se pudo enviar el email de disputa vía GHL:", err);
+  }
+}

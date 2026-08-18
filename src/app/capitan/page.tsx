@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getUsuarioActual } from "@/lib/auth/current-user";
 import { confirmarResultado, disputarResultado, marcarNotificacionLeida } from "./actions";
 import { CargarResultadoForm } from "./cargar-resultado-form";
+import { linkWhatsapp } from "@/lib/contacto";
 
 type EquipoRef = { nombre: string } | null;
 
@@ -168,6 +169,16 @@ export default async function CapitanHomePage() {
                   Disputar
                 </button>
               </form>
+              <a
+                href={linkWhatsapp(
+                  `Hola, quiero avisar sobre el partido Fecha ${p.fecha?.numero} — ${p.equipo_local?.nombre} vs ${p.equipo_visitante?.nombre}: `,
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-azul-noche/60 underline hover:text-naranja"
+              >
+                Avisar por WhatsApp
+              </a>
             </div>
           ))}
         </section>
@@ -184,7 +195,21 @@ export default async function CapitanHomePage() {
               Fecha {p.fecha?.numero} — {p.equipo_local?.nombre}{" "}
               {p.sets_local ?? "-"} - {p.sets_visitante ?? "-"} {p.equipo_visitante?.nombre}
             </span>
-            <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs">{p.estado}</span>
+            <span className="flex items-center gap-3">
+              <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs">{p.estado}</span>
+              {p.estado === "disputado" && (
+                <a
+                  href={linkWhatsapp(
+                    `Hola, quiero contarles sobre la disputa del partido Fecha ${p.fecha?.numero} — ${p.equipo_local?.nombre} vs ${p.equipo_visitante?.nombre}: `,
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-azul-noche/60 underline hover:text-naranja"
+                >
+                  Avisar por WhatsApp
+                </a>
+              )}
+            </span>
           </div>
         ))}
       </section>

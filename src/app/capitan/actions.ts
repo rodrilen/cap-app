@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { notificarResultadoPendiente } from "@/lib/ghl";
+import { notificarResultadoPendiente, notificarDisputa } from "@/lib/ghl";
 
 // Estas escrituras se hacen con el cliente autenticado del capitán (no
 // admin), a propósito: la policy RLS "capitan local carga resultado" /
@@ -134,8 +134,41 @@ export async function disputarResultado(formData: FormData) {
   const partidoId = String(formData.get("partido_id"));
 
   await supabase.from("partido").update({ estado: "disputado" }).eq("id", partidoId);
+  await avisarAdminDisputa(partidoId);
 
   revalidatePath("/capitan");
+}
+
+// A diferencia de avisarCapitanVisitante, acá no hace falta el cliente
+// admin: partido/equipo/fecha son de lectura pública, así que el cliente
+// autenticado del capitán que disputa ya puede leerlos.
+async function avisarAdminDisputa(partidoId: string) {
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+  if (!adminEmail) return;
+
+  const supabase = await createClient();
+  const { data: partido } = await supabase
+    .from("partido")
+    .select(
+      "equipo_local:equipo_local_id (nombre), equipo_visitante:equipo_visitante_id (nombre), fecha:fecha_id (numero)",
+    )
+    .eq("id", partidoId)
+    .single();
+
+  if (!partido) return;
+
+  const equipoLocal = partido.equipo_local as unknown as { nombre: string } | null;
+  const equipoVisitante = partido.equipo_visitante as unknown as { nombre: string } | null;
+  const fecha = partido.fecha as unknown as { numero: number } | null;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+  await notificarDisputa({
+    email: adminEmail,
+    equipoLocalNombre: equipoLocal?.nombre ?? "",
+    equipoVisitanteNombre: equipoVisitante?.nombre ?? "",
+    fechaNumero: fecha?.numero ?? 0,
+    urlAdmin: `${siteUrl}/admin/partidos`,
+  });
 }
 
 export async function marcarNotificacionLeida(formData: FormData) {
