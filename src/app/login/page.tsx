@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { login } from "./actions";
 
 export default async function LoginPage({
@@ -9,10 +10,17 @@ export default async function LoginPage({
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-8 bg-azul-noche p-8">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/isotipo-negativo.svg" alt="CAP" className="h-14" />
+      <Link href="/" className="flex flex-col items-center gap-2">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/isotipo-negativo.svg" alt="CAP" className="h-14" />
+      </Link>
       <div className="flex w-full max-w-sm flex-col gap-4 rounded bg-hueso p-6">
-        <h1 className="text-lg font-semibold text-azul-noche">Ingresar</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg font-semibold text-azul-noche">Ingresar</h1>
+          <Link href="/" className="text-sm text-azul-noche/60 hover:text-naranja">
+            ‹ Volver
+          </Link>
+        </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <form action={login} className="flex flex-col gap-4">
           <input type="hidden" name="next" value={next ?? ""} />
