@@ -12,7 +12,7 @@ export default function HomePage() {
           Pádel.
         </p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           href="/fixture"
           className="rounded border border-azul-noche/10 bg-white p-4 transition-colors hover:border-naranja"
@@ -29,6 +29,15 @@ export default function HomePage() {
           <h2 className="font-semibold text-azul-noche">Tabla de posiciones</h2>
           <p className="mt-1 text-sm text-azul-noche/60">
             Se actualiza sola con cada resultado confirmado.
+          </p>
+        </Link>
+        <Link
+          href="/ranking"
+          className="rounded border border-azul-noche/10 bg-white p-4 transition-colors hover:border-naranja"
+        >
+          <h2 className="font-semibold text-azul-noche">Rankings</h2>
+          <p className="mt-1 text-sm text-azul-noche/60">
+            Puntos por jugador y ranking general de equipos.
           </p>
         </Link>
         <Link

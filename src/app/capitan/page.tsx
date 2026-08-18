@@ -1,11 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getUsuarioActual } from "@/lib/auth/current-user";
-import {
-  cargarResultado,
-  confirmarResultado,
-  disputarResultado,
-  marcarNotificacionLeida,
-} from "./actions";
+import { confirmarResultado, disputarResultado, marcarNotificacionLeida } from "./actions";
+import { CargarResultadoForm } from "./cargar-resultado-form";
 
 type EquipoRef = { nombre: string } | null;
 
@@ -67,6 +63,29 @@ export default async function CapitanHomePage() {
     (p) => !paraCargar.includes(p) && !paraConfirmar.includes(p),
   );
 
+  const equiposRivalesIds = [...new Set(paraCargar.map((p) => p.equipo_visitante_id))];
+  const [{ data: jugadoresPropios }, { data: jugadoresRivalesData }] = await Promise.all([
+    supabase
+      .from("jugador")
+      .select("id, nombre")
+      .eq("equipo_id", usuario.equipo_id)
+      .order("nombre"),
+    equiposRivalesIds.length
+      ? supabase
+          .from("jugador")
+          .select("id, nombre, equipo_id")
+          .in("equipo_id", equiposRivalesIds)
+          .order("nombre")
+      : Promise.resolve({ data: [] as { id: string; nombre: string; equipo_id: string }[] }),
+  ]);
+
+  const jugadoresRivalesPorEquipo = new Map<string, { id: string; nombre: string }[]>();
+  for (const j of jugadoresRivalesData ?? []) {
+    const lista = jugadoresRivalesPorEquipo.get(j.equipo_id) ?? [];
+    lista.push({ id: j.id, nombre: j.nombre });
+    jugadoresRivalesPorEquipo.set(j.equipo_id, lista);
+  }
+
   return (
     <div className="flex flex-col gap-10">
       <h1 className="text-2xl font-semibold">Mis partidos</h1>
@@ -102,59 +121,19 @@ export default async function CapitanHomePage() {
       {!!paraCargar.length && (
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-medium">Para cargar (jugás de local)</h2>
+          <p className="text-sm text-azul-noche/60">
+            Cada encuentro se juega en 2 partidos, cada uno por una pareja distinta.
+          </p>
           {paraCargar.map((p) => (
-            <form
+            <CargarResultadoForm
               key={p.id}
-              action={cargarResultado}
-              className="flex flex-wrap items-end gap-2 rounded border border-zinc-200 p-3"
-            >
-              <input type="hidden" name="partido_id" value={p.id} />
-              <span className="w-full text-sm text-zinc-600">
-                Fecha {p.fecha?.numero} — {p.equipo_local?.nombre} vs{" "}
-                {p.equipo_visitante?.nombre} ({p.club?.nombre})
-              </span>
-              <label className="flex flex-col gap-1 text-sm">
-                Sets local
-                <input
-                  type="number"
-                  name="sets_local"
-                  min={0}
-                  required
-                  className="w-20 rounded border border-zinc-300 px-2 py-1"
-                />
-              </label>
-              <label className="flex flex-col gap-1 text-sm">
-                Sets visitante
-                <input
-                  type="number"
-                  name="sets_visitante"
-                  min={0}
-                  required
-                  className="w-20 rounded border border-zinc-300 px-2 py-1"
-                />
-              </label>
-              <label className="flex flex-col gap-1 text-sm">
-                Games local
-                <input
-                  type="number"
-                  name="games_local"
-                  min={0}
-                  className="w-20 rounded border border-zinc-300 px-2 py-1"
-                />
-              </label>
-              <label className="flex flex-col gap-1 text-sm">
-                Games visitante
-                <input
-                  type="number"
-                  name="games_visitante"
-                  min={0}
-                  className="w-20 rounded border border-zinc-300 px-2 py-1"
-                />
-              </label>
-              <button type="submit" className="rounded bg-naranja px-3 py-1 text-sm font-medium text-azul-noche">
-                Cargar resultado
-              </button>
-            </form>
+              partidoId={p.id}
+              encabezado={`Fecha ${p.fecha?.numero} — ${p.equipo_local?.nombre} vs ${p.equipo_visitante?.nombre} (${p.club?.nombre})`}
+              jugadoresPropios={jugadoresPropios ?? []}
+              jugadoresRivales={jugadoresRivalesPorEquipo.get(p.equipo_visitante_id) ?? []}
+              equipoLocalNombre={p.equipo_local?.nombre}
+              equipoVisitanteNombre={p.equipo_visitante?.nombre}
+            />
           ))}
         </section>
       )}

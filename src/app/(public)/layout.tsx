@@ -19,6 +19,9 @@ export default function PublicLayout({
           <Link href="/tabla" className="hover:text-naranja">
             Tabla de posiciones
           </Link>
+          <Link href="/ranking" className="hover:text-naranja">
+            Rankings
+          </Link>
           <Link href="/clubes" className="hover:text-naranja">
             Clubes
           </Link>

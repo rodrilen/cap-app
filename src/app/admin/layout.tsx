@@ -37,6 +37,9 @@ export default function AdminLayout({
             <Link href="/admin/partidos" className="hover:text-naranja">
               Partidos
             </Link>
+            <Link href="/admin/ranking-equipos" className="hover:text-naranja">
+              Ranking equipos
+            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-4">

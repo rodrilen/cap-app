@@ -9,6 +9,12 @@ import { createClient } from "@/lib/supabase/server";
 // UPDATE está permitido. Si el capitán no es local/visitante del partido,
 // Postgres simplemente no actualiza ninguna fila.
 
+// Cada encuentro se juega en 2 partidos individuales, cada uno por una
+// pareja distinta (no hay parejas fijas). Se cargan los 2 primero -- la
+// policy RLS de partido_individual exige que el partido padre siga
+// 'programado', así que el UPDATE que lo pasa a pendiente_confirmacion va
+// después. sets_local/sets_visitante del encuentro quedan en 0-2 según
+// cuántos de esos 2 partidos ganó cada equipo (no son sets de pádel).
 export async function cargarResultado(formData: FormData) {
   const supabase = await createClient();
   const {
@@ -18,11 +24,32 @@ export async function cargarResultado(formData: FormData) {
 
   const partidoId = String(formData.get("partido_id"));
 
+  const partidosIndividuales = [1, 2].map((numero) => {
+    const [setsLocal, setsVisitante] = String(formData.get(`p${numero}_resultado`))
+      .split("-")
+      .map(Number);
+    return {
+      partido_id: partidoId,
+      numero,
+      jugador_local_1_id: String(formData.get(`p${numero}_jugador_local_1`)),
+      jugador_local_2_id: String(formData.get(`p${numero}_jugador_local_2`)),
+      jugador_visitante_1_id: String(formData.get(`p${numero}_jugador_visitante_1`)),
+      jugador_visitante_2_id: String(formData.get(`p${numero}_jugador_visitante_2`)),
+      sets_local: setsLocal,
+      sets_visitante: setsVisitante,
+    };
+  });
+
+  const { error } = await supabase.from("partido_individual").insert(partidosIndividuales);
+  if (error) return;
+
+  const setsLocal = partidosIndividuales.filter((p) => p.sets_local > p.sets_visitante).length;
+
   await supabase
     .from("partido")
     .update({
-      sets_local: Number(formData.get("sets_local")),
-      sets_visitante: Number(formData.get("sets_visitante")),
+      sets_local: setsLocal,
+      sets_visitante: 2 - setsLocal,
       games_local: formData.get("games_local")
         ? Number(formData.get("games_local"))
         : null,
