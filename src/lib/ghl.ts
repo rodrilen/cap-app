@@ -117,3 +117,81 @@ export async function notificarDisputa({
     console.error("No se pudo enviar el email de disputa vía GHL:", err);
   }
 }
+
+// Le manda al capitán recién creado (vía el formulario de alta de GHL) su
+// login y contraseña temporal.
+export async function notificarCredencialesCapitan({
+  email,
+  password,
+  equipoNombre,
+  urlLogin,
+}: {
+  email: string;
+  password: string;
+  equipoNombre: string;
+  urlLogin: string;
+}) {
+  try {
+    const contactId = await upsertContacto(email);
+    await enviarEmail(
+      contactId,
+      `CAP: tu cuenta de capitán de ${equipoNombre}`,
+      `<p>Hola,</p>
+       <p>Te creamos tu cuenta de capitán del equipo <strong>${equipoNombre}</strong> en CAP.</p>
+       <p>Entrá con estos datos (después podés cambiar la contraseña desde "Mi cuenta"):</p>
+       <ul>
+         <li>Email: ${email}</li>
+         <li>Contraseña temporal: <strong>${password}</strong></li>
+       </ul>
+       <p><a href="${urlLogin}">${urlLogin}</a></p>
+       <p>— CAP, Circuito Abierto de Pádel</p>`,
+    );
+  } catch (err) {
+    console.error("No se pudo enviar las credenciales del capitán vía GHL:", err);
+  }
+}
+
+// Aviso al admin de lo que pasó con cada envío del formulario de alta de
+// equipos -- tanto si se creó todo bien (para que quede trazabilidad) como
+// si algo no se pudo resolver solo y necesita revisión manual.
+export async function notificarAltaEquipo(
+  params:
+    | {
+        exito: true;
+        equipoNombre: string;
+        clubNombre: string;
+        categoriaNombre: string;
+        jugadores: string[];
+        email: string;
+      }
+    | { exito: false; motivo: string; datosCrudos: unknown },
+) {
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+  if (!adminEmail) return;
+
+  try {
+    const contactId = await upsertContacto(adminEmail);
+    if (params.exito) {
+      await enviarEmail(
+        contactId,
+        `CAP: nuevo equipo creado automáticamente — ${params.equipoNombre}`,
+        `<p>Se creó automáticamente el equipo <strong>${params.equipoNombre}</strong>
+         (club ${params.clubNombre}, categoría ${params.categoriaNombre}) a partir del
+         formulario de alta.</p>
+         <p>Capitán: ${params.email}</p>
+         <p>Jugadores: ${params.jugadores.join(", ")}</p>`,
+      );
+    } else {
+      await enviarEmail(
+        contactId,
+        "CAP: formulario de alta recibido, necesita revisión manual",
+        `<p>Se recibió un envío del formulario de alta de equipos que no se pudo
+         procesar automáticamente:</p>
+         <p><strong>${params.motivo}</strong></p>
+         <pre>${JSON.stringify(params.datosCrudos, null, 2)}</pre>`,
+      );
+    }
+  } catch (err) {
+    console.error("No se pudo enviar el aviso de alta de equipo vía GHL:", err);
+  }
+}
