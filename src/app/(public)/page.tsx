@@ -44,9 +44,9 @@ export default function HomePage() {
           href="/clubes"
           className="rounded border border-azul-noche/10 bg-white p-4 transition-colors hover:border-naranja"
         >
-          <h2 className="font-semibold text-azul-noche">Clubes anfitriones</h2>
+          <h2 className="font-semibold text-azul-noche">Clubes y jugadores</h2>
           <p className="mt-1 text-sm text-azul-noche/60">
-            Dónde juegan los equipos sin sede propia.
+            Qué equipos y jugadores representan a cada club.
           </p>
         </Link>
       </div>
