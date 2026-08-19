@@ -21,14 +21,19 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
+  // GHL manda lo configurado en "Custom Data" del Webhook adentro de un
+  // objeto anidado `customData`, no en la raíz del payload -- el resto del
+  // body son los campos estándar del contacto (first_name, email, etc.)
+  // que no usamos porque ya pedimos todo explícito vía custom data.
+  const data = body.customData ?? body;
 
-  const email = String(body.captain_email ?? "").trim().toLowerCase();
-  const capitanNombre = String(body.capitan_nombre ?? "").trim();
-  const clubNombre = String(body.club ?? "").trim();
-  const categoriaNombre = String(body.categoria ?? "").trim();
+  const email = String(data.captain_email ?? "").trim().toLowerCase();
+  const capitanNombre = String(data.capitan_nombre ?? "").trim();
+  const clubNombre = String(data.club ?? "").trim();
+  const categoriaNombre = String(data.categoria ?? "").trim();
 
   const jugadoresNombres = [1, 2, 3, 4, 5, 6, 7]
-    .map((i) => String(body[`jugador_${i}`] ?? "").trim())
+    .map((i) => String(data[`jugador_${i}`] ?? "").trim())
     .filter(Boolean);
   if (capitanNombre) jugadoresNombres.unshift(capitanNombre);
 
