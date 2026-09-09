@@ -48,13 +48,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, skipped: "campos_faltantes" });
   }
 
+  // Si alguna de estas consultas falla por un problema de conexión (por
+  // ejemplo el proyecto de Supabase pausado por inactividad), Postgrest/el
+  // cliente devuelven data=null igual que un "no encontrado" real -- sin
+  // chequear `error` por separado, el mail terminaba diciendo "categoría
+  // no encontrada" para un problema completamente distinto (pasó una vez).
+  function esErrorDeConexion(error: { message?: string } | null) {
+    return !!error;
+  }
+
   // No duplicar si ya existe una cuenta con este email -- se avisa al admin
   // para que lo revise a mano en vez de intentar adivinar qué hacer.
-  const { data: yaExiste } = await admin
+  const { data: yaExiste, error: usuarioError } = await admin
     .from("usuario")
     .select("id")
     .eq("email", email)
     .maybeSingle();
+
+  if (esErrorDeConexion(usuarioError)) {
+    await notificarAltaEquipo({
+      exito: false,
+      motivo: `No se pudo consultar la base de datos (¿proyecto de Supabase pausado?): ${usuarioError?.message}`,
+      datosCrudos: body,
+    });
+    return NextResponse.json({ ok: false, skipped: "error_conexion" });
+  }
 
   if (yaExiste) {
     await notificarAltaEquipo({
@@ -65,11 +83,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, skipped: "email_duplicado" });
   }
 
-  const { data: categoria } = await admin
+  const { data: categoria, error: categoriaError } = await admin
     .from("categoria")
     .select("id")
     .ilike("nombre", categoriaNombre)
     .maybeSingle();
+
+  if (esErrorDeConexion(categoriaError)) {
+    await notificarAltaEquipo({
+      exito: false,
+      motivo: `No se pudo consultar la base de datos (¿proyecto de Supabase pausado?): ${categoriaError?.message}`,
+      datosCrudos: body,
+    });
+    return NextResponse.json({ ok: false, skipped: "error_conexion" });
+  }
 
   if (!categoria) {
     await notificarAltaEquipo({
@@ -80,11 +107,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, skipped: "categoria_no_encontrada" });
   }
 
-  let { data: club } = await admin
+  let { data: club, error: clubError } = await admin
     .from("club")
     .select("id, nombre")
     .ilike("nombre", clubNombre)
     .maybeSingle();
+
+  if (esErrorDeConexion(clubError)) {
+    await notificarAltaEquipo({
+      exito: false,
+      motivo: `No se pudo consultar la base de datos (¿proyecto de Supabase pausado?): ${clubError?.message}`,
+      datosCrudos: body,
+    });
+    return NextResponse.json({ ok: false, skipped: "error_conexion" });
+  }
 
   if (!club) {
     const { data: nuevoClub } = await admin
