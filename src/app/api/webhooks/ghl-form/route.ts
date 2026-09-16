@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { notificarAltaEquipo, notificarCredencialesCapitan } from "@/lib/ghl";
+import { notificarAltaEquipo } from "@/lib/ghl";
 
 // Webhook que dispara un Workflow de GHL ("Form Submitted" -> acción
 // Webhook) cuando un capitán completa el formulario de alta de equipo.
@@ -35,7 +35,13 @@ export async function POST(request: NextRequest) {
   const jugadoresNombres = [1, 2, 3, 4, 5, 6, 7]
     .map((i) => String(data[`jugador_${i}`] ?? "").trim())
     .filter(Boolean);
-  if (capitanNombre) jugadoresNombres.unshift(capitanNombre);
+
+  // El formulario pide al capitán que se anote a sí mismo como jugador 1, pero
+  // no todos lo hacen -- sumarlo sólo si todavía no figura, para no duplicarlo.
+  const capitanYaAnotado = jugadoresNombres.some(
+    (nombre) => nombre.toLowerCase() === capitanNombre.toLowerCase(),
+  );
+  if (capitanNombre && !capitanYaAnotado) jugadoresNombres.unshift(capitanNombre);
 
   const admin = createAdminClient();
 
@@ -170,10 +176,12 @@ export async function POST(request: NextRequest) {
     .from("jugador")
     .insert(jugadoresNombres.map((nombre) => ({ nombre, equipo_id: equipo.id })));
 
-  const password = generarPassword();
+  // Contraseña descartable: el capitán todavía no recibe nada. Las credenciales
+  // se mandan todas juntas cuando cierra la inscripción, y ahí se genera una
+  // contraseña nueva (ver /api/admin/enviar-credenciales).
   const { data: authUser, error: authError } = await admin.auth.admin.createUser({
     email,
-    password,
+    password: generarPassword(),
     email_confirm: true,
   });
 
@@ -191,15 +199,6 @@ export async function POST(request: NextRequest) {
     email,
     rol: "capitan",
     equipo_id: equipo.id,
-  });
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-
-  await notificarCredencialesCapitan({
-    email,
-    password,
-    equipoNombre,
-    urlLogin: `${siteUrl}/login`,
   });
 
   await notificarAltaEquipo({

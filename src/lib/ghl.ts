@@ -179,7 +179,9 @@ export async function notificarAltaEquipo(
          (club ${params.clubNombre}, categoría ${params.categoriaNombre}) a partir del
          formulario de alta.</p>
          <p>Capitán: ${params.email}</p>
-         <p>Jugadores: ${params.jugadores.join(", ")}</p>`,
+         <p>Jugadores: ${params.jugadores.join(", ")}</p>
+         <p><em>El capitán todavía no recibió sus credenciales: se envían todas
+         juntas cuando cierre la inscripción.</em></p>`,
       );
     } else {
       await enviarEmail(
