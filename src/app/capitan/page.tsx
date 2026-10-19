@@ -230,16 +230,9 @@ export default async function CapitanHomePage() {
                   Disputar
                 </button>
               </form>
-              <a
-                href={linkWhatsapp(
-                  `Hola, quiero avisar sobre el partido Fecha ${p.fecha?.numero} — ${p.equipo_local?.nombre} vs ${p.equipo_visitante?.nombre}: `,
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-azul-noche/60 underline hover:text-naranja"
-              >
-                Avisar por WhatsApp
-              </a>
+              <span className="text-xs text-zinc-500">
+                Al disputar te abrimos WhatsApp para que nos cuentes qué pasó.
+              </span>
               </div>
             </div>
           ))}

@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notificarResultadoPendiente, notificarDisputa } from "@/lib/ghl";
+import { linkWhatsapp } from "@/lib/contacto";
 
 // Estas escrituras se hacen con el cliente autenticado del capitán (no
 // admin), a propósito: la policy RLS "capitan local carga resultado" /
@@ -134,18 +136,26 @@ export async function disputarResultado(formData: FormData) {
   const partidoId = String(formData.get("partido_id"));
 
   await supabase.from("partido").update({ estado: "disputado" }).eq("id", partidoId);
-  await avisarAdminDisputa(partidoId);
+  const partido = await datosDelPartido(partidoId);
+  await avisarAdminDisputa(partido);
 
   revalidatePath("/capitan");
+
+  // El mail al admin avisa que hay una disputa, pero no por qué. Mandamos al
+  // capitán a WhatsApp para que cuente qué pasó sin tener que buscar el
+  // contacto por su cuenta.
+  redirect(
+    linkWhatsapp(
+      `Hola, disputo el resultado del partido Fecha ${partido?.fecha?.numero} — ` +
+        `${partido?.equipoLocal?.nombre} vs ${partido?.equipoVisitante?.nombre}: `,
+    ),
+  );
 }
 
 // A diferencia de avisarCapitanVisitante, acá no hace falta el cliente
 // admin: partido/equipo/fecha son de lectura pública, así que el cliente
 // autenticado del capitán que disputa ya puede leerlos.
-async function avisarAdminDisputa(partidoId: string) {
-  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
-  if (!adminEmail) return;
-
+async function datosDelPartido(partidoId: string) {
   const supabase = await createClient();
   const { data: partido } = await supabase
     .from("partido")
@@ -155,18 +165,26 @@ async function avisarAdminDisputa(partidoId: string) {
     .eq("id", partidoId)
     .single();
 
-  if (!partido) return;
+  if (!partido) return null;
 
-  const equipoLocal = partido.equipo_local as unknown as { nombre: string } | null;
-  const equipoVisitante = partido.equipo_visitante as unknown as { nombre: string } | null;
-  const fecha = partido.fecha as unknown as { numero: number } | null;
+  return {
+    equipoLocal: partido.equipo_local as unknown as { nombre: string } | null,
+    equipoVisitante: partido.equipo_visitante as unknown as { nombre: string } | null,
+    fecha: partido.fecha as unknown as { numero: number } | null,
+  };
+}
+
+async function avisarAdminDisputa(partido: Awaited<ReturnType<typeof datosDelPartido>>) {
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+  if (!adminEmail || !partido) return;
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   await notificarDisputa({
     email: adminEmail,
-    equipoLocalNombre: equipoLocal?.nombre ?? "",
-    equipoVisitanteNombre: equipoVisitante?.nombre ?? "",
-    fechaNumero: fecha?.numero ?? 0,
+    equipoLocalNombre: partido.equipoLocal?.nombre ?? "",
+    equipoVisitanteNombre: partido.equipoVisitante?.nombre ?? "",
+    fechaNumero: partido.fecha?.numero ?? 0,
     urlAdmin: `${siteUrl}/admin/partidos`,
   });
 }
