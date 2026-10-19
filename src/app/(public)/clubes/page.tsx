@@ -33,7 +33,7 @@ export default async function ClubesPage() {
         <h1 className="text-2xl font-black uppercase tracking-tight text-azul-noche">
           Clubes y jugadores
         </h1>
-        <p className="mt-1 text-sm text-azul-noche/60">
+        <p className="mt-1 text-sm text-azul-noche/70">
           Los equipos y jugadores que representan a cada club.
         </p>
       </div>
@@ -43,7 +43,7 @@ export default async function ClubesPage() {
           <div key={club.id} className="rounded border border-azul-noche/10 bg-white p-4">
             <h2 className="font-semibold text-azul-noche">{club.nombre}</h2>
             {club.direccion && (
-              <p className="mt-1 text-sm text-azul-noche/60">{club.direccion}</p>
+              <p className="mt-1 text-sm text-azul-noche/70">{club.direccion}</p>
             )}
 
             <div className="mt-3 flex flex-col gap-2">
@@ -64,7 +64,7 @@ export default async function ClubesPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-azul-noche/60">
+                  <p className="text-sm text-azul-noche/70">
                     {equipo.jugador.length
                       ? equipo.jugador.map((j) => j.nombre).join(", ")
                       : "Sin jugadores cargados."}

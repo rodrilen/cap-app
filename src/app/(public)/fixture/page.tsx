@@ -132,7 +132,7 @@ export default async function FixturePage({
           <section key={fecha.id} className="flex flex-col gap-2">
             <h2 className="text-lg font-semibold text-azul-noche">
               Fecha {fecha.numero}
-              <span className="ml-2 text-sm font-normal text-azul-noche/50">
+              <span className="ml-2 text-sm font-normal text-azul-noche/70">
                 {new Date(`${fecha.fecha_programada}T00:00:00`).toLocaleDateString(
                   "es-AR",
                   { day: "2-digit", month: "2-digit", year: "numeric" },
@@ -164,13 +164,13 @@ export default async function FixturePage({
                       {p.equipo_visitante?.nombre}
                     </Link>
                   </span>
-                  <span className="text-azul-noche/50">{p.club?.nombre}</span>
+                  <span className="text-azul-noche/70">{p.club?.nombre}</span>
                   <span className={`rounded px-2 py-0.5 text-xs ${estadoClasses(p.estado)}`}>
                     {ESTADO_LABEL[p.estado] ?? p.estado}
                   </span>
 
                   {!!parcialesPorPartido.get(p.id)?.length && (
-                    <span className="w-full text-xs text-azul-noche/50">
+                    <span className="w-full text-xs text-azul-noche/70">
                       {parcialesPorPartido.get(p.id)!.join("  ·  ")}
                     </span>
                   )}

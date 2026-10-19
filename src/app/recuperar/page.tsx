@@ -18,7 +18,7 @@ export default async function RecuperarPage({
       <div className="flex w-full max-w-sm flex-col gap-4 rounded bg-hueso p-6">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold text-azul-noche">Recuperar acceso</h1>
-          <Link href="/login" className="text-sm text-azul-noche/60 hover:text-naranja">
+          <Link href="/login" className="text-sm text-azul-noche/70 hover:text-naranja">
             ‹ Volver
           </Link>
         </div>
@@ -71,7 +71,7 @@ export default async function RecuperarPage({
           )}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-center text-sm text-azul-noche/60 underline hover:text-naranja"
+          className="text-center text-sm text-azul-noche/70 underline hover:text-naranja"
         >
           Prefiero escribirles por WhatsApp
         </a>

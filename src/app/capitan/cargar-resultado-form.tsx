@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { cargarResultado } from "./actions";
 
 type Jugador = { id: string; nombre: string };
@@ -193,7 +193,7 @@ function BloquePartido({
               onChange={(v) => onSetsChange({ ...sets, s1l: v })}
               required
             />
-            <span className="text-zinc-400">-</span>
+            <span className="text-zinc-500">-</span>
             <InputGames
               name={`p${numero}_set1_visitante`}
               value={sets.s1v}
@@ -212,7 +212,7 @@ function BloquePartido({
               onChange={(v) => onSetsChange({ ...sets, s2l: v })}
               required
             />
-            <span className="text-zinc-400">-</span>
+            <span className="text-zinc-500">-</span>
             <InputGames
               name={`p${numero}_set2_visitante`}
               value={sets.s2v}
@@ -232,7 +232,7 @@ function BloquePartido({
                 onChange={(v) => onSetsChange({ ...sets, tbl: v })}
                 required
               />
-              <span className="text-zinc-400">-</span>
+              <span className="text-zinc-500">-</span>
               <InputGames
                 name={`p${numero}_tb_visitante`}
                 value={sets.tbv}
@@ -268,6 +268,7 @@ export function CargarResultadoForm({
   equipoLocalNombre?: string;
   equipoVisitanteNombre?: string;
 }) {
+  const [estado, formAction, enviando] = useActionState(cargarResultado, {});
   const [sets1, setSets1] = useState<Sets>(SETS_VACIOS);
   const [sets2, setSets2] = useState<Sets>(SETS_VACIOS);
   const [pareja1, setPareja1] = useState<Pareja>(PAREJA_VACIA);
@@ -280,7 +281,7 @@ export function CargarResultadoForm({
 
   return (
     <form
-      action={cargarResultado}
+      action={formAction}
       className="flex flex-col gap-3 rounded border border-zinc-200 p-3"
     >
       <input type="hidden" name="partido_id" value={partidoId} />
@@ -309,15 +310,21 @@ export function CargarResultadoForm({
         onParejaChange={setPareja2}
       />
 
+      {estado.error && (
+        <p className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+          {estado.error}
+        </p>
+      )}
+
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
-          disabled={hayEmpate || hayJugadorRepetido}
+          disabled={hayEmpate || hayJugadorRepetido || enviando}
           className="min-h-11 w-full rounded bg-naranja px-4 text-base font-medium text-azul-noche disabled:opacity-40 sm:w-auto"
         >
-          Cargar resultado
+          {enviando ? "Guardando…" : "Cargar resultado"}
         </button>
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-zinc-600">
           Los sets y los games se calculan solos a partir de los parciales.
         </span>
       </div>

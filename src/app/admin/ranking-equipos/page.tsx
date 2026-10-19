@@ -42,7 +42,7 @@ export default async function RankingEquiposAdminPage() {
             <input type="hidden" name="equipo_id" value={equipo.id} />
             <span className="flex-1">
               {equipo.nombre}{" "}
-              <span className="text-sm text-zinc-500">
+              <span className="text-sm text-zinc-600">
                 ({(equipo.categoria as unknown as { nombre: string } | null)?.nombre})
               </span>
             </span>
@@ -66,7 +66,7 @@ export default async function RankingEquiposAdminPage() {
           </form>
         ))}
         {!equipos?.length && (
-          <p className="text-sm text-zinc-400">Todavía no hay equipos cargados.</p>
+          <p className="text-sm text-zinc-500">Todavía no hay equipos cargados.</p>
         )}
       </div>
     </div>

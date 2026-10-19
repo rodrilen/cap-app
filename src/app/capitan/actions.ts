@@ -19,12 +19,17 @@ import { linkWhatsapp } from "@/lib/contacto";
 // 'programado', así que el UPDATE que lo pasa a pendiente_confirmacion va
 // después. sets_local/sets_visitante del encuentro quedan en 0-2 según
 // cuántos de esos 2 partidos ganó cada equipo (no son sets de pádel).
-export async function cargarResultado(formData: FormData) {
+export type EstadoCarga = { error?: string };
+
+export async function cargarResultado(
+  _prev: EstadoCarga,
+  formData: FormData,
+): Promise<EstadoCarga> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) return { error: "Se cerró tu sesión. Volvé a entrar e intentá de nuevo." };
 
   const partidoId = String(formData.get("partido_id"));
 
@@ -89,7 +94,15 @@ export async function cargarResultado(formData: FormData) {
   const { error } = await supabase
     .from("partido_individual")
     .insert(partidosIndividuales.map((p) => p.fila));
-  if (error) return;
+
+  // Antes esto volvía en silencio: el capitán tocaba el botón, no pasaba
+  // nada y no había ninguna pista de por qué (pasó con Supabase pausado).
+  if (error) {
+    return {
+      error:
+        "No se pudo guardar el resultado. Probá de nuevo en un minuto; si sigue igual, avisanos por WhatsApp.",
+    };
+  }
 
   const setsLocal = partidosIndividuales.filter(
     (p) => p.fila.sets_local > p.fila.sets_visitante,
@@ -107,9 +120,14 @@ export async function cargarResultado(formData: FormData) {
     })
     .eq("id", partidoId);
 
-  if (!updateError) {
-    await avisarCapitanVisitante(partidoId);
+  if (updateError) {
+    return {
+      error:
+        "Se guardaron los partidos pero no se pudo cerrar el encuentro. Avisanos por WhatsApp así lo revisamos.",
+    };
   }
+
+  await avisarCapitanVisitante(partidoId);
 
   revalidatePath("/capitan");
   // Sin esto el formulario desaparece y no queda ninguna señal de que la

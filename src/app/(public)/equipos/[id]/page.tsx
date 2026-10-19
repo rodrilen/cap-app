@@ -75,7 +75,7 @@ export default async function FichaEquipoPage({
           </span>
         )}
       </div>
-      <p className="-mt-6 text-sm text-azul-noche/60">
+      <p className="-mt-6 text-sm text-azul-noche/70">
         Sede: {clubSede?.nombre}
         {clubSede?.direccion && ` (${clubSede.direccion})`}
       </p>

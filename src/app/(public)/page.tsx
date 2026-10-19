@@ -18,7 +18,7 @@ export default function HomePage() {
           className="rounded border border-azul-noche/10 bg-white p-4 transition-colors hover:border-naranja"
         >
           <h2 className="font-semibold text-azul-noche">Fixture y resultados</h2>
-          <p className="mt-1 text-sm text-azul-noche/60">
+          <p className="mt-1 text-sm text-azul-noche/70">
             Partidos por fecha, con el club sede de cada uno.
           </p>
         </Link>
@@ -27,7 +27,7 @@ export default function HomePage() {
           className="rounded border border-azul-noche/10 bg-white p-4 transition-colors hover:border-naranja"
         >
           <h2 className="font-semibold text-azul-noche">Tabla de posiciones</h2>
-          <p className="mt-1 text-sm text-azul-noche/60">
+          <p className="mt-1 text-sm text-azul-noche/70">
             Se actualiza sola con cada resultado confirmado.
           </p>
         </Link>
@@ -36,7 +36,7 @@ export default function HomePage() {
           className="rounded border border-azul-noche/10 bg-white p-4 transition-colors hover:border-naranja"
         >
           <h2 className="font-semibold text-azul-noche">Rankings</h2>
-          <p className="mt-1 text-sm text-azul-noche/60">
+          <p className="mt-1 text-sm text-azul-noche/70">
             Puntos por jugador y ranking general de equipos.
           </p>
         </Link>
@@ -45,7 +45,7 @@ export default function HomePage() {
           className="rounded border border-azul-noche/10 bg-white p-4 transition-colors hover:border-naranja"
         >
           <h2 className="font-semibold text-azul-noche">Clubes y jugadores</h2>
-          <p className="mt-1 text-sm text-azul-noche/60">
+          <p className="mt-1 text-sm text-azul-noche/70">
             Qué equipos y jugadores representan a cada club.
           </p>
         </Link>

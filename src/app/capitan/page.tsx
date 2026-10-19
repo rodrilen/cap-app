@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getUsuarioActual } from "@/lib/auth/current-user";
 import { confirmarResultado, disputarResultado, marcarNotificacionLeida } from "./actions";
 import { CargarResultadoForm } from "./cargar-resultado-form";
+import { BotonEnviar } from "./boton-enviar";
 import { linkWhatsapp } from "@/lib/contacto";
 import { ESTADO_LABEL, estadoClasses } from "@/lib/brand";
 
@@ -61,7 +62,7 @@ function LineaResultado({ p }: { p: PartidoRow }) {
       Fecha {p.fecha?.numero} — {p.equipo_local?.nombre} {p.sets_local ?? "-"} -{" "}
       {p.sets_visitante ?? "-"} {p.equipo_visitante?.nombre}
       {p.games_local !== null && p.games_visitante !== null && (
-        <span className="text-zinc-500">
+        <span className="text-zinc-600">
           {" "}
           · {p.games_local} - {p.games_visitante} games
         </span>
@@ -206,7 +207,7 @@ export default async function CapitanHomePage({
       {!!paraCargar.length && (
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-medium">Para cargar (jugás de local)</h2>
-          <p className="text-sm text-azul-noche/60">
+          <p className="text-sm text-azul-noche/70">
             Cada encuentro se juega en 2 partidos, cada uno por una pareja distinta.
           </p>
           {paraCargar.map((p) => (
@@ -233,10 +234,10 @@ export default async function CapitanHomePage({
               </span>
 
               {!!individualesPorPartido.get(p.id)?.length && (
-                <ul className="flex flex-col gap-1 text-sm text-zinc-500">
+                <ul className="flex flex-col gap-1 text-sm text-zinc-600">
                   {individualesPorPartido.get(p.id)!.map((ind) => (
                     <li key={ind.numero}>
-                      <span className="text-zinc-400">Partido {ind.numero}:</span>{" "}
+                      <span className="text-zinc-500">Partido {ind.numero}:</span>{" "}
                       {ind.local_1?.nombre} / {ind.local_2?.nombre}{" "}
                       <strong className="text-zinc-700">{marcador(ind)}</strong>{" "}
                       {ind.visitante_1?.nombre} / {ind.visitante_2?.nombre}
@@ -248,23 +249,23 @@ export default async function CapitanHomePage({
               <div className="flex flex-wrap items-center gap-3">
               <form action={confirmarResultado}>
                 <input type="hidden" name="partido_id" value={p.id} />
-                <button
-                  type="submit"
+                <BotonEnviar
+                  textoPendiente="Confirmando…"
                   className="min-h-11 rounded bg-naranja px-4 text-base font-medium text-azul-noche"
                 >
                   Confirmar
-                </button>
+                </BotonEnviar>
               </form>
               <form action={disputarResultado}>
                 <input type="hidden" name="partido_id" value={p.id} />
-                <button
-                  type="submit"
+                <BotonEnviar
+                  textoPendiente="Abriendo WhatsApp…"
                   className="min-h-11 rounded border border-red-300 px-4 text-base text-red-600"
                 >
                   Disputar
-                </button>
+                </BotonEnviar>
               </form>
-              <span className="text-xs text-zinc-500">
+              <span className="text-xs text-zinc-600">
                 Al disputar te abrimos WhatsApp para que nos cuentes qué pasó.
               </span>
               </div>
@@ -294,7 +295,7 @@ export default async function CapitanHomePage({
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-azul-noche/60 underline hover:text-naranja"
+                  className="text-xs text-azul-noche/70 underline hover:text-naranja"
                 >
                   Avisar por WhatsApp
                 </a>

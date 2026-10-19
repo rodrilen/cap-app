@@ -109,12 +109,12 @@ export default async function RankingPage({
             <tbody>
               {jugadores.map((j, i) => (
                 <tr key={j.jugador_id} className="border-b border-azul-noche/10 bg-white odd:bg-hueso/60">
-                  <td className="py-2 pr-2 pl-3 text-azul-noche/50">{i + 1}</td>
+                  <td className="py-2 pr-2 pl-3 text-azul-noche/70">{i + 1}</td>
                   <td className="py-2 pr-2">
                     {j.jugador_nombre}
                     <Link
                       href={`/equipos/${j.equipo_id}`}
-                      className="block text-xs text-azul-noche/50 hover:underline sm:hidden"
+                      className="block text-xs text-azul-noche/70 hover:underline sm:hidden"
                     >
                       {j.equipo_nombre}
                     </Link>
@@ -142,7 +142,7 @@ export default async function RankingPage({
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-azul-noche">Ranking de equipos</h2>
-        <p className="text-sm text-azul-noche/60">
+        <p className="text-sm text-azul-noche/70">
           El puntaje por posición final se asigna al terminar la temporada completa.
         </p>
         <div className="overflow-x-auto rounded border border-azul-noche/10">
@@ -159,7 +159,7 @@ export default async function RankingPage({
             <tbody>
               {equipos.map((e, i) => (
                 <tr key={e.equipo_id} className="border-b border-azul-noche/10 bg-white odd:bg-hueso/60">
-                  <td className="py-2 pr-2 pl-3 text-azul-noche/50">{i + 1}</td>
+                  <td className="py-2 pr-2 pl-3 text-azul-noche/70">{i + 1}</td>
                   <td className="py-2 pr-2">
                     <Link href={`/equipos/${e.equipo_id}`} className="hover:underline">
                       {e.equipo_nombre}

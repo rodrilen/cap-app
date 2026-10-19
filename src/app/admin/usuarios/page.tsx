@@ -25,7 +25,7 @@ export default async function UsuariosPage() {
             className="flex flex-wrap items-center gap-3 rounded border border-zinc-200 p-3"
           >
             <span className="flex-1">{capitan.email}</span>
-            <span className="text-sm text-zinc-500">
+            <span className="text-sm text-zinc-600">
               {(capitan.equipo as unknown as { nombre: string } | null)?.nombre}
             </span>
             <form action={borrarCapitan}>

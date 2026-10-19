@@ -96,7 +96,7 @@ export default async function TablaPage({
                 key={fila.equipo_id}
                 className="border-b border-azul-noche/10 bg-white odd:bg-hueso/60"
               >
-                <td className="py-2 pr-2 pl-3 text-azul-noche/50">{i + 1}</td>
+                <td className="py-2 pr-2 pl-3 text-azul-noche/70">{i + 1}</td>
                 <td className="py-2 pr-2">
                   <Link href={`/equipos/${fila.equipo_id}`} className="hover:underline">
                     {fila.equipo_nombre}

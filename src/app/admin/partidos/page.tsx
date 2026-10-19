@@ -77,7 +77,7 @@ export default async function AdminPartidosPage() {
                 ["games_visitante", "Games visitante", p.games_visitante],
               ] as const
             ).map(([name, etiqueta, valor]) => (
-              <label key={name} className="flex flex-col gap-1 text-xs text-zinc-500">
+              <label key={name} className="flex flex-col gap-1 text-xs text-zinc-600">
                 {etiqueta}
                 <input
                   type="number"
