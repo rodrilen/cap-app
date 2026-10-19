@@ -6,6 +6,17 @@ import { linkWhatsapp } from "@/lib/contacto";
 
 type EquipoRef = { nombre: string } | null;
 
+type IndividualRow = {
+  partido_id: string;
+  numero: number;
+  sets_local: number;
+  sets_visitante: number;
+  local_1: EquipoRef;
+  local_2: EquipoRef;
+  visitante_1: EquipoRef;
+  visitante_2: EquipoRef;
+};
+
 type PartidoRow = {
   id: string;
   estado: string;
@@ -81,6 +92,25 @@ export default async function CapitanHomePage() {
   const resto = partidos.filter(
     (p) => !paraCargar.includes(p) && !paraConfirmar.includes(p),
   );
+
+  // Para confirmar con criterio (o para disputar) hace falta ver qué pareja
+  // jugó cada partido y cómo salió, no sólo el agregado del encuentro.
+  const { data: individualesData } = paraConfirmar.length
+    ? await supabase
+        .from("partido_individual")
+        .select(
+          "partido_id, numero, sets_local, sets_visitante, local_1:jugador_local_1_id (nombre), local_2:jugador_local_2_id (nombre), visitante_1:jugador_visitante_1_id (nombre), visitante_2:jugador_visitante_2_id (nombre)",
+        )
+        .in("partido_id", paraConfirmar.map((p) => p.id))
+        .order("numero")
+    : { data: [] };
+
+  const individualesPorPartido = new Map<string, IndividualRow[]>();
+  for (const ind of (individualesData ?? []) as unknown as IndividualRow[]) {
+    const lista = individualesPorPartido.get(ind.partido_id) ?? [];
+    lista.push(ind);
+    individualesPorPartido.set(ind.partido_id, lista);
+  }
 
   const equiposRivalesIds = [...new Set(paraCargar.map((p) => p.equipo_visitante_id))];
   const [{ data: jugadoresPropios }, { data: jugadoresRivalesData }] = await Promise.all([
@@ -161,13 +191,27 @@ export default async function CapitanHomePage() {
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-medium">Para confirmar (jugás de visitante)</h2>
           {paraConfirmar.map((p) => (
-            <div
-              key={p.id}
-              className="flex flex-wrap items-center gap-3 rounded border border-zinc-200 p-3"
-            >
+            <div key={p.id} className="flex flex-col gap-3 rounded border border-zinc-200 p-3">
               <span className="text-sm text-zinc-600">
                 <LineaResultado p={p} />
               </span>
+
+              {!!individualesPorPartido.get(p.id)?.length && (
+                <ul className="flex flex-col gap-1 text-sm text-zinc-500">
+                  {individualesPorPartido.get(p.id)!.map((ind) => (
+                    <li key={ind.numero}>
+                      <span className="text-zinc-400">Partido {ind.numero}:</span>{" "}
+                      {ind.local_1?.nombre} / {ind.local_2?.nombre}{" "}
+                      <strong className="text-zinc-700">
+                        {ind.sets_local} - {ind.sets_visitante}
+                      </strong>{" "}
+                      {ind.visitante_1?.nombre} / {ind.visitante_2?.nombre}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="flex flex-wrap items-center gap-3">
               <form action={confirmarResultado}>
                 <input type="hidden" name="partido_id" value={p.id} />
                 <button
@@ -196,6 +240,7 @@ export default async function CapitanHomePage() {
               >
                 Avisar por WhatsApp
               </a>
+              </div>
             </div>
           ))}
         </section>
