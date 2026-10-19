@@ -22,12 +22,15 @@ export async function POST(request: NextRequest) {
   }
 
   const enviar = request.nextUrl.searchParams.get("enviar") === "1";
+  // ?email= limita el envío a un capitán puntual (un equipo que se anotó tarde,
+  // o uno de prueba) sin volver a mandarle el acceso a todos los demás.
+  const soloEmail = request.nextUrl.searchParams.get("email")?.trim().toLowerCase();
   const admin = createAdminClient();
 
-  const { data: capitanes, error } = await admin
-    .from("usuario")
-    .select("id, email, equipo_id")
-    .eq("rol", "capitan");
+  let consulta = admin.from("usuario").select("id, email, equipo_id").eq("rol", "capitan");
+  if (soloEmail) consulta = consulta.eq("email", soloEmail);
+
+  const { data: capitanes, error } = await consulta;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
