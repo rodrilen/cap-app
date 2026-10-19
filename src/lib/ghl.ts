@@ -197,3 +197,32 @@ export async function notificarAltaEquipo(
     console.error("No se pudo enviar el aviso de alta de equipo vía GHL:", err);
   }
 }
+
+// Link de recuperación de contraseña. A diferencia de notificarCredenciales-
+// Capitan, acá no se manda una contraseña nueva: el link es de un solo uso y
+// la contraseña la elige el capitán. Así nadie puede dejar afuera a otro con
+// sólo saber su email.
+export async function notificarRecuperacion({
+  email,
+  urlRecuperacion,
+}: {
+  email: string;
+  urlRecuperacion: string;
+}) {
+  try {
+    const contactId = await upsertContacto(email);
+    await enviarEmail(
+      contactId,
+      "CAP: recuperá el acceso a tu cuenta",
+      `<p>Hola,</p>
+       <p>Pediste recuperar el acceso a tu cuenta de capitán en CAP. Entrá
+       desde este link y elegí una contraseña nueva:</p>
+       <p><a href="${urlRecuperacion}">${urlRecuperacion}</a></p>
+       <p>El link sirve una sola vez y vence en una hora. Si no fuiste vos,
+       ignorá este mail: tu contraseña actual sigue funcionando.</p>
+       <p>— CAP, Circuito Abierto de Pádel</p>`,
+    );
+  } catch (err) {
+    console.error("No se pudo enviar el link de recuperación vía GHL:", err);
+  }
+}

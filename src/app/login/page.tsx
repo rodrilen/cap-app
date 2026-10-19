@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { login } from "./actions";
-import { linkWhatsapp } from "@/lib/contacto";
 
 export default async function LoginPage({
   searchParams,
@@ -52,16 +51,12 @@ export default async function LoginPage({
             Ingresar
           </button>
         </form>
-        <a
-          href={linkWhatsapp(
-            "Hola, soy capitán y no puedo entrar a la app de CAP. ¿Me reenvían el acceso?",
-          )}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href="/recuperar"
           className="text-center text-sm text-azul-noche/60 underline hover:text-naranja"
         >
           ¿Olvidaste tu contraseña?
-        </a>
+        </Link>
       </div>
     </main>
   );
