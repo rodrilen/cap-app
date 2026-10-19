@@ -67,34 +67,27 @@ export default async function AdminPartidosPage() {
               Fecha {p.fecha?.numero} — {p.equipo_local?.nombre} vs{" "}
               {p.equipo_visitante?.nombre} ({p.club?.nombre})
             </span>
-            <input
-              type="number"
-              name="sets_local"
-              defaultValue={p.sets_local ?? ""}
-              placeholder="Sets L"
-              className="w-20 rounded border border-zinc-300 px-2 py-1"
-            />
-            <input
-              type="number"
-              name="sets_visitante"
-              defaultValue={p.sets_visitante ?? ""}
-              placeholder="Sets V"
-              className="w-20 rounded border border-zinc-300 px-2 py-1"
-            />
-            <input
-              type="number"
-              name="games_local"
-              defaultValue={p.games_local ?? ""}
-              placeholder="Games L"
-              className="w-24 rounded border border-zinc-300 px-2 py-1"
-            />
-            <input
-              type="number"
-              name="games_visitante"
-              defaultValue={p.games_visitante ?? ""}
-              placeholder="Games V"
-              className="w-24 rounded border border-zinc-300 px-2 py-1"
-            />
+            {/* El placeholder desaparece al cargar el valor y quedaban cuatro
+                números sueltos sin forma de saber cuál era cuál. */}
+            {(
+              [
+                ["sets_local", "Sets local", p.sets_local],
+                ["sets_visitante", "Sets visitante", p.sets_visitante],
+                ["games_local", "Games local", p.games_local],
+                ["games_visitante", "Games visitante", p.games_visitante],
+              ] as const
+            ).map(([name, etiqueta, valor]) => (
+              <label key={name} className="flex flex-col gap-1 text-xs text-zinc-500">
+                {etiqueta}
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  name={name}
+                  defaultValue={valor ?? ""}
+                  className="min-h-11 w-24 rounded border border-zinc-300 px-2 text-base text-azul-noche"
+                />
+              </label>
+            ))}
             <select
               name="estado"
               defaultValue={p.estado}

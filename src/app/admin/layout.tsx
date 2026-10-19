@@ -8,11 +8,11 @@ export default function AdminLayout({
 }) {
   return (
     <div className="flex flex-1 flex-col">
-      <header className="flex flex-wrap items-center justify-between gap-3 bg-azul-noche px-6 py-4">
-        <div className="flex flex-wrap items-center gap-4">
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 bg-azul-noche px-6 py-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/isotipo-negativo.svg" alt="CAP" className="h-6" />
-          <nav className="flex flex-wrap gap-4 text-sm font-medium text-hueso">
+          <nav className="flex flex-wrap gap-x-3 gap-y-1 text-sm font-medium text-hueso">
             <Link href="/admin" className="hover:text-naranja">
               Inicio
             </Link>
@@ -42,15 +42,15 @@ export default function AdminLayout({
             </Link>
           </nav>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="/" className="text-sm text-hueso/60 hover:text-naranja">
+        <div className="flex items-center gap-3 text-xs">
+          <Link href="/" className="text-hueso/60 hover:text-naranja">
             Ver sitio público
           </Link>
-          <Link href="/cuenta" className="text-sm text-hueso/60 hover:text-naranja">
+          <Link href="/cuenta" className="text-hueso/60 hover:text-naranja">
             Cambiar contraseña
           </Link>
           <form action={logout}>
-            <button type="submit" className="text-sm text-hueso/60 hover:text-naranja">
+            <button type="submit" className="text-hueso/60 hover:text-naranja">
               Cerrar sesión
             </button>
           </form>

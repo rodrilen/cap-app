@@ -25,7 +25,8 @@ export function ChangePasswordForm() {
           name="password"
           required
           minLength={8}
-          className="rounded border border-azul-noche/20 px-3 py-2"
+          autoComplete="new-password"
+          className="min-h-11 rounded border border-azul-noche/20 px-3 text-base"
         />
       </label>
       <label className="flex flex-col gap-1 text-sm">
@@ -35,14 +36,15 @@ export function ChangePasswordForm() {
           name="confirmacion"
           required
           minLength={8}
-          className="rounded border border-azul-noche/20 px-3 py-2"
+          autoComplete="new-password"
+          className="min-h-11 rounded border border-azul-noche/20 px-3 text-base"
         />
       </label>
       {state.error && <p className="text-sm text-red-600">{state.error}</p>}
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-naranja px-4 py-2 font-medium text-azul-noche disabled:opacity-50"
+        className="min-h-11 rounded bg-naranja px-4 font-medium text-azul-noche disabled:opacity-50"
       >
         {pending ? "Guardando…" : "Guardar contraseña"}
       </button>

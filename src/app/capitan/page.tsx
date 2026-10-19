@@ -3,6 +3,7 @@ import { getUsuarioActual } from "@/lib/auth/current-user";
 import { confirmarResultado, disputarResultado, marcarNotificacionLeida } from "./actions";
 import { CargarResultadoForm } from "./cargar-resultado-form";
 import { linkWhatsapp } from "@/lib/contacto";
+import { ESTADO_LABEL, estadoClasses } from "@/lib/brand";
 
 type EquipoRef = { nombre: string } | null;
 
@@ -69,7 +70,17 @@ function LineaResultado({ p }: { p: PartidoRow }) {
   );
 }
 
-export default async function CapitanHomePage() {
+const AVISOS: Record<string, string> = {
+  cargado: "Resultado cargado. Le avisamos al capitán rival para que lo confirme.",
+  confirmado: "Resultado confirmado. Ya suma en la tabla de posiciones.",
+};
+
+export default async function CapitanHomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ aviso?: string }>;
+}) {
+  const { aviso } = await searchParams;
   const usuario = await getUsuarioActual();
   if (!usuario) return null;
 
@@ -157,6 +168,12 @@ export default async function CapitanHomePage() {
   return (
     <div className="flex flex-col gap-10">
       <h1 className="text-2xl font-semibold">Mis partidos</h1>
+
+      {aviso && AVISOS[aviso] && (
+        <p className="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800">
+          {AVISOS[aviso]}
+        </p>
+      )}
 
       {!!notificaciones?.length && (
         <section className="flex flex-col gap-2">
@@ -267,7 +284,9 @@ export default async function CapitanHomePage() {
               <LineaResultado p={p} />
             </span>
             <span className="flex items-center gap-3">
-              <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs">{p.estado}</span>
+              <span className={`rounded px-2 py-0.5 text-xs ${estadoClasses(p.estado)}`}>
+                {ESTADO_LABEL[p.estado] ?? p.estado}
+              </span>
               {p.estado === "disputado" && (
                 <a
                   href={linkWhatsapp(

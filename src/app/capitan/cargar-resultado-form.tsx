@@ -15,6 +15,17 @@ type Sets = {
 
 const SETS_VACIOS: Sets = { s1l: "", s1v: "", s2l: "", s2v: "", tbl: "", tbv: "" };
 
+// Los cuatro jugadores de un partido individual. Un jugador sí puede repetirse
+// entre el Partido 1 y el 2 (hay equipos de sólo 3 jugadores), pero no puede
+// ser los dos integrantes de la misma pareja.
+type Pareja = { l1: string; l2: string; v1: string; v2: string };
+
+const PAREJA_VACIA: Pareja = { l1: "", l2: "", v1: "", v2: "" };
+
+function hayRepetido(a: string, b: string) {
+  return a !== "" && a === b;
+}
+
 function ganadorDeSet(local: string, visitante: string) {
   if (local === "" || visitante === "") return null;
   const l = Number(local);
@@ -41,11 +52,23 @@ function tieneSetEmpatado(sets: Sets) {
 // text-base (16px) no es decorativo: con una fuente menor, Safari en iPhone
 // hace zoom al enfocar el campo y descoloca toda la pantalla. El min-h-11
 // (44px) es el mínimo recomendado para tocar con el pulgar.
-function SelectJugador({ name, jugadores }: { name: string; jugadores: Jugador[] }) {
+function SelectJugador({
+  name,
+  jugadores,
+  value,
+  onChange,
+}: {
+  name: string;
+  jugadores: Jugador[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <select
       name={name}
       required
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
       className="min-h-11 w-full rounded border border-zinc-300 px-2 text-base"
     >
       <option value="">Elegir…</option>
@@ -92,6 +115,8 @@ function BloquePartido({
   equipoVisitanteNombre,
   sets,
   onSetsChange,
+  pareja,
+  onParejaChange,
 }: {
   numero: 1 | 2;
   jugadoresPropios: Jugador[];
@@ -100,9 +125,13 @@ function BloquePartido({
   equipoVisitanteNombre?: string;
   sets: Sets;
   onSetsChange: (sets: Sets) => void;
+  pareja: Pareja;
+  onParejaChange: (pareja: Pareja) => void;
 }) {
   const conTiebreak = necesitaTiebreak(sets);
   const empatado = tieneSetEmpatado(sets);
+  const localRepetido = hayRepetido(pareja.l1, pareja.l2);
+  const visitanteRepetido = hayRepetido(pareja.v1, pareja.v2);
 
   return (
     <fieldset className="flex flex-col gap-3 rounded border border-zinc-200 p-3">
@@ -111,21 +140,48 @@ function BloquePartido({
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm">
           {equipoLocalNombre ?? "Local"} — jugador 1
-          <SelectJugador name={`p${numero}_jugador_local_1`} jugadores={jugadoresPropios} />
+          <SelectJugador
+            name={`p${numero}_jugador_local_1`}
+            jugadores={jugadoresPropios}
+            value={pareja.l1}
+            onChange={(v) => onParejaChange({ ...pareja, l1: v })}
+          />
         </label>
         <label className="flex flex-col gap-1 text-sm">
           {equipoLocalNombre ?? "Local"} — jugador 2
-          <SelectJugador name={`p${numero}_jugador_local_2`} jugadores={jugadoresPropios} />
+          <SelectJugador
+            name={`p${numero}_jugador_local_2`}
+            jugadores={jugadoresPropios}
+            value={pareja.l2}
+            onChange={(v) => onParejaChange({ ...pareja, l2: v })}
+          />
         </label>
         <label className="flex flex-col gap-1 text-sm">
           {equipoVisitanteNombre ?? "Visitante"} — jugador 1
-          <SelectJugador name={`p${numero}_jugador_visitante_1`} jugadores={jugadoresRivales} />
+          <SelectJugador
+            name={`p${numero}_jugador_visitante_1`}
+            jugadores={jugadoresRivales}
+            value={pareja.v1}
+            onChange={(v) => onParejaChange({ ...pareja, v1: v })}
+          />
         </label>
         <label className="flex flex-col gap-1 text-sm">
           {equipoVisitanteNombre ?? "Visitante"} — jugador 2
-          <SelectJugador name={`p${numero}_jugador_visitante_2`} jugadores={jugadoresRivales} />
+          <SelectJugador
+            name={`p${numero}_jugador_visitante_2`}
+            jugadores={jugadoresRivales}
+            value={pareja.v2}
+            onChange={(v) => onParejaChange({ ...pareja, v2: v })}
+          />
         </label>
       </div>
+
+      {(localRepetido || visitanteRepetido) && (
+        <p className="text-sm text-red-600">
+          {localRepetido ? equipoLocalNombre ?? "El local" : equipoVisitanteNombre ?? "El visitante"}{" "}
+          tiene el mismo jugador dos veces en esta pareja.
+        </p>
+      )}
 
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col gap-1 text-sm">
@@ -214,8 +270,13 @@ export function CargarResultadoForm({
 }) {
   const [sets1, setSets1] = useState<Sets>(SETS_VACIOS);
   const [sets2, setSets2] = useState<Sets>(SETS_VACIOS);
+  const [pareja1, setPareja1] = useState<Pareja>(PAREJA_VACIA);
+  const [pareja2, setPareja2] = useState<Pareja>(PAREJA_VACIA);
 
   const hayEmpate = tieneSetEmpatado(sets1) || tieneSetEmpatado(sets2);
+  const hayJugadorRepetido = [pareja1, pareja2].some(
+    (p) => hayRepetido(p.l1, p.l2) || hayRepetido(p.v1, p.v2),
+  );
 
   return (
     <form
@@ -233,6 +294,8 @@ export function CargarResultadoForm({
         equipoVisitanteNombre={equipoVisitanteNombre}
         sets={sets1}
         onSetsChange={setSets1}
+        pareja={pareja1}
+        onParejaChange={setPareja1}
       />
       <BloquePartido
         numero={2}
@@ -242,12 +305,14 @@ export function CargarResultadoForm({
         equipoVisitanteNombre={equipoVisitanteNombre}
         sets={sets2}
         onSetsChange={setSets2}
+        pareja={pareja2}
+        onParejaChange={setPareja2}
       />
 
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
-          disabled={hayEmpate}
+          disabled={hayEmpate || hayJugadorRepetido}
           className="min-h-11 w-full rounded bg-naranja px-4 text-base font-medium text-azul-noche disabled:opacity-40 sm:w-auto"
         >
           Cargar resultado

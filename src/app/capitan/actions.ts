@@ -112,6 +112,9 @@ export async function cargarResultado(formData: FormData) {
   }
 
   revalidatePath("/capitan");
+  // Sin esto el formulario desaparece y no queda ninguna señal de que la
+  // carga salió bien: el partido simplemente se mueve de sección.
+  redirect("/capitan?aviso=cargado");
 }
 
 // El capitán local no tiene permiso (por RLS) para leer el email del
@@ -171,6 +174,7 @@ export async function confirmarResultado(formData: FormData) {
     .eq("id", partidoId);
 
   revalidatePath("/capitan");
+  redirect("/capitan?aviso=confirmado");
 }
 
 export async function disputarResultado(formData: FormData) {

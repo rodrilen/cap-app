@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { login } from "./actions";
+import { linkWhatsapp } from "@/lib/contacto";
 
 export default async function LoginPage({
   searchParams,
@@ -30,7 +31,8 @@ export default async function LoginPage({
               type="email"
               name="email"
               required
-              className="rounded border border-azul-noche/20 bg-white px-3 py-2"
+              autoComplete="email"
+              className="min-h-11 rounded border border-azul-noche/20 bg-white px-3 text-base"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm text-azul-noche">
@@ -39,16 +41,27 @@ export default async function LoginPage({
               type="password"
               name="password"
               required
-              className="rounded border border-azul-noche/20 bg-white px-3 py-2"
+              autoComplete="current-password"
+              className="min-h-11 rounded border border-azul-noche/20 bg-white px-3 text-base"
             />
           </label>
           <button
             type="submit"
-            className="rounded bg-naranja px-4 py-2 font-medium text-azul-noche hover:opacity-90"
+            className="min-h-11 rounded bg-naranja px-4 font-medium text-azul-noche hover:opacity-90"
           >
             Ingresar
           </button>
         </form>
+        <a
+          href={linkWhatsapp(
+            "Hola, soy capitán y no puedo entrar a la app de CAP. ¿Me reenvían el acceso?",
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-center text-sm text-azul-noche/60 underline hover:text-naranja"
+        >
+          ¿Olvidaste tu contraseña?
+        </a>
       </div>
     </main>
   );

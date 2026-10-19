@@ -23,12 +23,15 @@ export default async function PublicLayout({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo-horizontal-negativo.svg" alt="CAP" className="h-8" />
         </Link>
-        <nav className="flex items-center gap-5 text-sm font-medium text-hueso">
+        {/* Sin flex-wrap el último link quedaba pegado al borde en 375px y
+            se cortaba directamente en pantallas de 360px. */}
+        <nav className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium text-hueso">
           <Link href="/fixture" className="hover:text-naranja">
             Fixture
           </Link>
           <Link href="/tabla" className="hover:text-naranja">
-            Tabla de posiciones
+            <span className="sm:hidden">Tabla</span>
+            <span className="hidden sm:inline">Tabla de posiciones</span>
           </Link>
           <Link href="/ranking" className="hover:text-naranja">
             Rankings
