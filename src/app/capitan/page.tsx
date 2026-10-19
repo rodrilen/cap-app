@@ -11,11 +11,30 @@ type IndividualRow = {
   numero: number;
   sets_local: number;
   sets_visitante: number;
+  set1_local: number | null;
+  set1_visitante: number | null;
+  set2_local: number | null;
+  set2_visitante: number | null;
+  tb_local: number | null;
+  tb_visitante: number | null;
   local_1: EquipoRef;
   local_2: EquipoRef;
   visitante_1: EquipoRef;
   visitante_2: EquipoRef;
 };
+
+// Las filas cargadas antes de que existieran los parciales sólo tienen los
+// sets; para esas se muestra el agregado como antes.
+function marcador(ind: IndividualRow) {
+  const parciales = [
+    [ind.set1_local, ind.set1_visitante],
+    [ind.set2_local, ind.set2_visitante],
+    [ind.tb_local, ind.tb_visitante],
+  ].filter(([l, v]) => l !== null && v !== null);
+
+  if (!parciales.length) return `${ind.sets_local} - ${ind.sets_visitante}`;
+  return parciales.map(([l, v]) => `${l}-${v}`).join("  ");
+}
 
 type PartidoRow = {
   id: string;
@@ -99,7 +118,7 @@ export default async function CapitanHomePage() {
     ? await supabase
         .from("partido_individual")
         .select(
-          "partido_id, numero, sets_local, sets_visitante, local_1:jugador_local_1_id (nombre), local_2:jugador_local_2_id (nombre), visitante_1:jugador_visitante_1_id (nombre), visitante_2:jugador_visitante_2_id (nombre)",
+          "partido_id, numero, sets_local, sets_visitante, set1_local, set1_visitante, set2_local, set2_visitante, tb_local, tb_visitante, local_1:jugador_local_1_id (nombre), local_2:jugador_local_2_id (nombre), visitante_1:jugador_visitante_1_id (nombre), visitante_2:jugador_visitante_2_id (nombre)",
         )
         .in("partido_id", paraConfirmar.map((p) => p.id))
         .order("numero")
@@ -202,9 +221,7 @@ export default async function CapitanHomePage() {
                     <li key={ind.numero}>
                       <span className="text-zinc-400">Partido {ind.numero}:</span>{" "}
                       {ind.local_1?.nombre} / {ind.local_2?.nombre}{" "}
-                      <strong className="text-zinc-700">
-                        {ind.sets_local} - {ind.sets_visitante}
-                      </strong>{" "}
+                      <strong className="text-zinc-700">{marcador(ind)}</strong>{" "}
                       {ind.visitante_1?.nombre} / {ind.visitante_2?.nombre}
                     </li>
                   ))}

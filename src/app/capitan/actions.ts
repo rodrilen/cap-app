@@ -29,37 +29,79 @@ export async function cargarResultado(formData: FormData) {
   const partidoId = String(formData.get("partido_id"));
 
   const partidosIndividuales = [1, 2].map((numero) => {
-    const [setsLocal, setsVisitante] = String(formData.get(`p${numero}_resultado`))
-      .split("-")
-      .map(Number);
+    const num = (campo: string) => {
+      const valor = formData.get(`p${numero}_${campo}`);
+      return valor === null || valor === "" ? null : Number(valor);
+    };
+
+    const set1Local = num("set1_local");
+    const set1Visitante = num("set1_visitante");
+    const set2Local = num("set2_local");
+    const set2Visitante = num("set2_visitante");
+    const tbLocal = num("tb_local");
+    const tbVisitante = num("tb_visitante");
+
+    // El súper tiebreak reemplaza al tercer set: vale un set para quien lo
+    // gana, y un solo game (no se suman sus puntos al total).
+    const setsGanados = [
+      [set1Local, set1Visitante],
+      [set2Local, set2Visitante],
+      [tbLocal, tbVisitante],
+    ].reduce(
+      (acc, [local, visitante]) => {
+        if (local === null || visitante === null || local === visitante) return acc;
+        return local > visitante
+          ? { local: acc.local + 1, visitante: acc.visitante }
+          : { local: acc.local, visitante: acc.visitante + 1 };
+      },
+      { local: 0, visitante: 0 },
+    );
+
+    const gamesLocal =
+      (set1Local ?? 0) + (set2Local ?? 0) + (tbLocal !== null && tbVisitante !== null && tbLocal > tbVisitante ? 1 : 0);
+    const gamesVisitante =
+      (set1Visitante ?? 0) +
+      (set2Visitante ?? 0) +
+      (tbLocal !== null && tbVisitante !== null && tbVisitante > tbLocal ? 1 : 0);
+
     return {
-      partido_id: partidoId,
-      numero,
-      jugador_local_1_id: String(formData.get(`p${numero}_jugador_local_1`)),
-      jugador_local_2_id: String(formData.get(`p${numero}_jugador_local_2`)),
-      jugador_visitante_1_id: String(formData.get(`p${numero}_jugador_visitante_1`)),
-      jugador_visitante_2_id: String(formData.get(`p${numero}_jugador_visitante_2`)),
-      sets_local: setsLocal,
-      sets_visitante: setsVisitante,
+      fila: {
+        partido_id: partidoId,
+        numero,
+        jugador_local_1_id: String(formData.get(`p${numero}_jugador_local_1`)),
+        jugador_local_2_id: String(formData.get(`p${numero}_jugador_local_2`)),
+        jugador_visitante_1_id: String(formData.get(`p${numero}_jugador_visitante_1`)),
+        jugador_visitante_2_id: String(formData.get(`p${numero}_jugador_visitante_2`)),
+        sets_local: setsGanados.local,
+        sets_visitante: setsGanados.visitante,
+        set1_local: set1Local,
+        set1_visitante: set1Visitante,
+        set2_local: set2Local,
+        set2_visitante: set2Visitante,
+        tb_local: tbLocal,
+        tb_visitante: tbVisitante,
+      },
+      gamesLocal,
+      gamesVisitante,
     };
   });
 
-  const { error } = await supabase.from("partido_individual").insert(partidosIndividuales);
+  const { error } = await supabase
+    .from("partido_individual")
+    .insert(partidosIndividuales.map((p) => p.fila));
   if (error) return;
 
-  const setsLocal = partidosIndividuales.filter((p) => p.sets_local > p.sets_visitante).length;
+  const setsLocal = partidosIndividuales.filter(
+    (p) => p.fila.sets_local > p.fila.sets_visitante,
+  ).length;
 
   const { error: updateError } = await supabase
     .from("partido")
     .update({
       sets_local: setsLocal,
       sets_visitante: 2 - setsLocal,
-      games_local: formData.get("games_local")
-        ? Number(formData.get("games_local"))
-        : null,
-      games_visitante: formData.get("games_visitante")
-        ? Number(formData.get("games_visitante"))
-        : null,
+      games_local: partidosIndividuales.reduce((t, p) => t + p.gamesLocal, 0),
+      games_visitante: partidosIndividuales.reduce((t, p) => t + p.gamesVisitante, 0),
       estado: "pendiente_confirmacion",
       cargado_por: user.id,
     })
