@@ -93,13 +93,16 @@ export default async function RankingPage({
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold text-azul-noche">Ranking de jugadores</h2>
         <div className="overflow-x-auto rounded border border-azul-noche/10">
-          <table className="w-full min-w-[420px] border-collapse text-sm">
+          {/* Igual que en la tabla de posiciones: en el teléfono la columna de
+              puntos quedaba fuera de pantalla. El equipo pasa a mostrarse
+              debajo del nombre del jugador en vez de ocupar su propia columna. */}
+          <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-azul-noche text-left text-hueso">
                 <th className="py-2 pr-2 pl-3">#</th>
                 <th className="py-2 pr-2">Jugador</th>
-                <th className="py-2 pr-2">Equipo</th>
-                <th className="py-2 pr-2 text-right">Partidos</th>
+                <th className="hidden py-2 pr-2 sm:table-cell">Equipo</th>
+                <th className="hidden py-2 pr-2 text-right sm:table-cell">Partidos</th>
                 <th className="py-2 pr-3 text-right">Puntos</th>
               </tr>
             </thead>
@@ -107,13 +110,21 @@ export default async function RankingPage({
               {jugadores.map((j, i) => (
                 <tr key={j.jugador_id} className="border-b border-azul-noche/10 bg-white odd:bg-hueso/60">
                   <td className="py-2 pr-2 pl-3 text-azul-noche/50">{i + 1}</td>
-                  <td className="py-2 pr-2">{j.jugador_nombre}</td>
                   <td className="py-2 pr-2">
+                    {j.jugador_nombre}
+                    <Link
+                      href={`/equipos/${j.equipo_id}`}
+                      className="block text-xs text-azul-noche/50 hover:underline sm:hidden"
+                    >
+                      {j.equipo_nombre}
+                    </Link>
+                  </td>
+                  <td className="hidden py-2 pr-2 sm:table-cell">
                     <Link href={`/equipos/${j.equipo_id}`} className="hover:underline">
                       {j.equipo_nombre}
                     </Link>
                   </td>
-                  <td className="py-2 pr-2 text-right">{j.partidos_jugados}</td>
+                  <td className="hidden py-2 pr-2 text-right sm:table-cell">{j.partidos_jugados}</td>
                   <td className="py-2 pr-3 text-right font-semibold">{j.puntos_totales}</td>
                 </tr>
               ))}
@@ -135,13 +146,13 @@ export default async function RankingPage({
           El puntaje por posición final se asigna al terminar la temporada completa.
         </p>
         <div className="overflow-x-auto rounded border border-azul-noche/10">
-          <table className="w-full min-w-[480px] border-collapse text-sm">
+          <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-azul-noche text-left text-hueso">
                 <th className="py-2 pr-2 pl-3">#</th>
                 <th className="py-2 pr-2">Equipo</th>
-                <th className="py-2 pr-2">Posición final</th>
-                <th className="py-2 pr-2 text-right">Bonus fase regular</th>
+                <th className="hidden py-2 pr-2 sm:table-cell">Posición final</th>
+                <th className="hidden py-2 pr-2 text-right sm:table-cell">Bonus fase regular</th>
                 <th className="py-2 pr-3 text-right">Puntos</th>
               </tr>
             </thead>
@@ -154,10 +165,10 @@ export default async function RankingPage({
                       {e.equipo_nombre}
                     </Link>
                   </td>
-                  <td className="py-2 pr-2">
+                  <td className="hidden py-2 pr-2 sm:table-cell">
                     {e.posicion_final ? POSICION_LABEL[e.posicion_final] ?? e.posicion_final : "—"}
                   </td>
-                  <td className="py-2 pr-2 text-right">{e.puntos_bonus}</td>
+                  <td className="hidden py-2 pr-2 text-right sm:table-cell">{e.puntos_bonus}</td>
                   <td className="py-2 pr-3 text-right font-semibold">{e.puntos_totales}</td>
                 </tr>
               ))}

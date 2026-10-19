@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { BotonBorrar } from "../boton-borrar";
 import { crearClub, actualizarClub, borrarClub } from "./actions";
 
 export default async function ClubesPage() {
@@ -52,13 +53,7 @@ export default async function ClubesPage() {
             >
               Guardar
             </button>
-            <button
-              type="submit"
-              formAction={borrarClub}
-              className="rounded border border-red-300 px-3 py-1 text-sm text-red-600"
-            >
-              Borrar
-            </button>
+            <BotonBorrar formAction={borrarClub} confirmacion={`¿Borrar el club "${club.nombre}"?`} />
           </form>
         ))}
       </div>

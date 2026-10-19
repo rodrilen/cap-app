@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { BotonBorrar } from "../boton-borrar";
 import { borrarCapitan } from "./actions";
 import { CrearCapitanForm } from "./crear-capitan-form";
 
@@ -29,12 +30,9 @@ export default async function UsuariosPage() {
             </span>
             <form action={borrarCapitan}>
               <input type="hidden" name="id" value={capitan.id} />
-              <button
-                type="submit"
-                className="rounded border border-red-300 px-3 py-1 text-sm text-red-600"
-              >
-                Borrar
-              </button>
+              <BotonBorrar
+                confirmacion={`¿Borrar la cuenta de capitán ${capitan.email}?`}
+              />
             </form>
           </div>
         ))}

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { BotonBorrar } from "../boton-borrar";
 import { crearFecha, actualizarFecha, borrarFecha } from "./actions";
 
 const ETAPAS = ["liga", "semifinal", "final"] as const;
@@ -64,13 +65,7 @@ export default async function FechasPage() {
             <button type="submit" className="rounded bg-naranja px-3 py-1 text-sm font-medium text-azul-noche">
               Guardar
             </button>
-            <button
-              type="submit"
-              formAction={borrarFecha}
-              className="rounded border border-red-300 px-3 py-1 text-sm text-red-600"
-            >
-              Borrar
-            </button>
+            <BotonBorrar formAction={borrarFecha} confirmacion={`¿Borrar la fecha ${fecha.numero}?`} />
           </form>
         ))}
       </div>

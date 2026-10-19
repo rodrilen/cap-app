@@ -113,11 +113,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, skipped: "categoria_no_encontrada" });
   }
 
-  let { data: club, error: clubError } = await admin
+  const busquedaClub = await admin
     .from("club")
     .select("id, nombre")
     .ilike("nombre", clubNombre)
     .maybeSingle();
+
+  let club = busquedaClub.data;
+  const clubError = busquedaClub.error;
 
   if (esErrorDeConexion(clubError)) {
     await notificarAltaEquipo({

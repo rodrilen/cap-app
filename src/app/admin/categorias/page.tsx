@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { BotonBorrar } from "../boton-borrar";
 import { crearCategoria, actualizarCategoria, borrarCategoria } from "./actions";
 
 export default async function CategoriasPage() {
@@ -33,13 +34,7 @@ export default async function CategoriasPage() {
             <button type="submit" className="rounded bg-naranja px-3 py-1 text-sm font-medium text-azul-noche">
               Guardar
             </button>
-            <button
-              type="submit"
-              formAction={borrarCategoria}
-              className="rounded border border-red-300 px-3 py-1 text-sm text-red-600"
-            >
-              Borrar
-            </button>
+            <BotonBorrar formAction={borrarCategoria} confirmacion={`¿Borrar la categoría "${categoria.nombre}"?`} />
           </form>
         ))}
       </div>

@@ -73,17 +73,20 @@ export default async function TablaPage({
       </div>
 
       <div className="overflow-x-auto rounded border border-azul-noche/10">
-        <table className="w-full min-w-[560px] border-collapse text-sm">
+        {/* En el teléfono sólo entran cuatro columnas: si se dejan todas, la
+            de puntos queda fuera de pantalla y hay que descubrir que se
+            scrollea de costado para ver lo único que importa. */}
+        <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-azul-noche text-left text-hueso">
               <th className="py-2 pr-2 pl-3">#</th>
               <th className="py-2 pr-2">Equipo</th>
               <th className="py-2 pr-2 text-right">PJ</th>
-              <th className="py-2 pr-2 text-right">PG</th>
-              <th className="py-2 pr-2 text-right">PE</th>
-              <th className="py-2 pr-2 text-right">PP</th>
-              <th className="py-2 pr-2 text-right">Dif. sets</th>
-              <th className="py-2 pr-2 text-right">Dif. games</th>
+              <th className="hidden py-2 pr-2 text-right sm:table-cell">PG</th>
+              <th className="hidden py-2 pr-2 text-right sm:table-cell">PE</th>
+              <th className="hidden py-2 pr-2 text-right sm:table-cell">PP</th>
+              <th className="hidden py-2 pr-2 text-right sm:table-cell">Dif. sets</th>
+              <th className="hidden py-2 pr-2 text-right sm:table-cell">Dif. games</th>
               <th className="py-2 pr-3 text-right">Pts</th>
             </tr>
           </thead>
@@ -100,11 +103,11 @@ export default async function TablaPage({
                   </Link>
                 </td>
                 <td className="py-2 pr-2 text-right">{fila.partidos_jugados}</td>
-                <td className="py-2 pr-2 text-right">{fila.partidos_ganados}</td>
-                <td className="py-2 pr-2 text-right">{fila.partidos_empatados}</td>
-                <td className="py-2 pr-2 text-right">{fila.partidos_perdidos}</td>
-                <td className="py-2 pr-2 text-right">{fila.diferencia_sets}</td>
-                <td className="py-2 pr-2 text-right">{fila.diferencia_games}</td>
+                <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.partidos_ganados}</td>
+                <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.partidos_empatados}</td>
+                <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.partidos_perdidos}</td>
+                <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.diferencia_sets}</td>
+                <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.diferencia_games}</td>
                 <td className="py-2 pr-3 text-right font-semibold">{fila.puntos}</td>
               </tr>
             ))}

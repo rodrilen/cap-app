@@ -38,9 +38,16 @@ function tieneSetEmpatado(sets: Sets) {
   );
 }
 
+// text-base (16px) no es decorativo: con una fuente menor, Safari en iPhone
+// hace zoom al enfocar el campo y descoloca toda la pantalla. El min-h-11
+// (44px) es el mínimo recomendado para tocar con el pulgar.
 function SelectJugador({ name, jugadores }: { name: string; jugadores: Jugador[] }) {
   return (
-    <select name={name} required className="rounded border border-zinc-300 px-2 py-1">
+    <select
+      name={name}
+      required
+      className="min-h-11 w-full rounded border border-zinc-300 px-2 text-base"
+    >
       <option value="">Elegir…</option>
       {jugadores.map((j) => (
         <option key={j.id} value={j.id}>
@@ -65,13 +72,14 @@ function InputGames({
   return (
     <input
       type="number"
+      inputMode="numeric"
       name={name}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       required={required}
       min={0}
       max={99}
-      className="w-14 rounded border border-zinc-300 px-2 py-1 text-center"
+      className="min-h-11 w-16 rounded border border-zinc-300 px-2 text-center text-base"
     />
   );
 }
@@ -100,7 +108,7 @@ function BloquePartido({
     <fieldset className="flex flex-col gap-3 rounded border border-zinc-200 p-3">
       <legend className="text-sm font-medium text-azul-noche">Partido {numero}</legend>
 
-      <div className="flex flex-wrap items-end gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm">
           {equipoLocalNombre ?? "Local"} — jugador 1
           <SelectJugador name={`p${numero}_jugador_local_1`} jugadores={jugadoresPropios} />
@@ -240,7 +248,7 @@ export function CargarResultadoForm({
         <button
           type="submit"
           disabled={hayEmpate}
-          className="rounded bg-naranja px-3 py-1 text-sm font-medium text-azul-noche disabled:opacity-40"
+          className="min-h-11 w-full rounded bg-naranja px-4 text-base font-medium text-azul-noche disabled:opacity-40 sm:w-auto"
         >
           Cargar resultado
         </button>

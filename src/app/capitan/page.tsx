@@ -233,7 +233,7 @@ export default async function CapitanHomePage() {
                 <input type="hidden" name="partido_id" value={p.id} />
                 <button
                   type="submit"
-                  className="rounded bg-naranja px-3 py-1 text-sm font-medium text-azul-noche"
+                  className="min-h-11 rounded bg-naranja px-4 text-base font-medium text-azul-noche"
                 >
                   Confirmar
                 </button>
@@ -242,7 +242,7 @@ export default async function CapitanHomePage() {
                 <input type="hidden" name="partido_id" value={p.id} />
                 <button
                   type="submit"
-                  className="rounded border border-red-300 px-3 py-1 text-sm text-red-600"
+                  className="min-h-11 rounded border border-red-300 px-4 text-base text-red-600"
                 >
                   Disputar
                 </button>

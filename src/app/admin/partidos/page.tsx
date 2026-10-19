@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { BotonBorrar } from "../boton-borrar";
 import { crearPartido, actualizarPartido, borrarPartido } from "./actions";
 
 const ESTADOS = [
@@ -108,13 +109,10 @@ export default async function AdminPartidosPage() {
             <button type="submit" className="rounded bg-naranja px-3 py-1 text-sm font-medium text-azul-noche">
               Guardar
             </button>
-            <button
-              type="submit"
+            <BotonBorrar
               formAction={borrarPartido}
-              className="rounded border border-red-300 px-3 py-1 text-sm text-red-600"
-            >
-              Borrar
-            </button>
+              confirmacion={`¿Borrar el partido de la Fecha ${p.fecha?.numero} entre ${p.equipo_local?.nombre} y ${p.equipo_visitante?.nombre}?`}
+            />
           </form>
         ))}
       </div>
