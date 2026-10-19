@@ -21,6 +21,24 @@ type PartidoRow = {
   equipo_visitante: EquipoRef;
 };
 
+// El visitante confirma a ciegas si solo ve los sets: los games son el cuarto
+// criterio de desempate de la tabla, así que tienen que estar a la vista antes
+// de apretar Confirmar.
+function LineaResultado({ p }: { p: PartidoRow }) {
+  return (
+    <span>
+      Fecha {p.fecha?.numero} — {p.equipo_local?.nombre} {p.sets_local ?? "-"} -{" "}
+      {p.sets_visitante ?? "-"} {p.equipo_visitante?.nombre}
+      {p.games_local !== null && p.games_visitante !== null && (
+        <span className="text-zinc-500">
+          {" "}
+          · {p.games_local} - {p.games_visitante} games
+        </span>
+      )}
+    </span>
+  );
+}
+
 export default async function CapitanHomePage() {
   const usuario = await getUsuarioActual();
   if (!usuario) return null;
@@ -148,8 +166,7 @@ export default async function CapitanHomePage() {
               className="flex flex-wrap items-center gap-3 rounded border border-zinc-200 p-3"
             >
               <span className="text-sm text-zinc-600">
-                Fecha {p.fecha?.numero} — {p.equipo_local?.nombre} {p.sets_local} -{" "}
-                {p.sets_visitante} {p.equipo_visitante?.nombre}
+                <LineaResultado p={p} />
               </span>
               <form action={confirmarResultado}>
                 <input type="hidden" name="partido_id" value={p.id} />
@@ -192,8 +209,7 @@ export default async function CapitanHomePage() {
             className="flex flex-wrap items-center justify-between gap-2 rounded border border-zinc-200 p-3 text-sm text-zinc-600"
           >
             <span>
-              Fecha {p.fecha?.numero} — {p.equipo_local?.nombre}{" "}
-              {p.sets_local ?? "-"} - {p.sets_visitante ?? "-"} {p.equipo_visitante?.nombre}
+              <LineaResultado p={p} />
             </span>
             <span className="flex items-center gap-3">
               <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs">{p.estado}</span>
