@@ -26,8 +26,11 @@ export function estadoClasses(estado: string) {
     case "confirmado":
     case "walkover":
       return "bg-azul-profundo text-hueso";
+    // Ámbar y no rojo: un partido disputado está esperando que el admin lo
+    // revise, no es un error. En el fixture público el rojo daba a entender
+    // que algo estaba roto.
     case "disputado":
-      return "bg-red-100 text-red-700";
+      return "bg-amber-100 text-amber-800";
     default:
       return "bg-black/5 text-azul-noche/70";
   }

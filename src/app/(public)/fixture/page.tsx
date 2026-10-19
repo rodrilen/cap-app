@@ -15,6 +15,17 @@ type PartidoRow = {
   equipo_visitante: EquipoRef;
 };
 
+type IndividualRow = {
+  partido_id: string;
+  numero: number;
+  set1_local: number | null;
+  set1_visitante: number | null;
+  set2_local: number | null;
+  set2_visitante: number | null;
+  tb_local: number | null;
+  tb_visitante: number | null;
+};
+
 export default async function FixturePage({
   searchParams,
 }: {
@@ -54,6 +65,41 @@ export default async function FixturePage({
     : { data: [] as PartidoRow[] };
 
   const partidos = (partidosData ?? []) as unknown as PartidoRow[];
+
+  // El "2 - 0" del encuentro cuenta partidos individuales ganados, no games:
+  // sin los parciales no se puede saber si fue una paliza o se definió en el
+  // último punto. Sólo para los que ya están cerrados.
+  const idsCerrados = partidos
+    .filter((p) => p.estado === "confirmado" || p.estado === "walkover")
+    .map((p) => p.id);
+
+  const { data: individualesData } = idsCerrados.length
+    ? await supabase
+        .from("partido_individual")
+        .select(
+          "partido_id, numero, set1_local, set1_visitante, set2_local, set2_visitante, tb_local, tb_visitante",
+        )
+        .in("partido_id", idsCerrados)
+        .order("numero")
+    : { data: [] };
+
+  const parcialesPorPartido = new Map<string, string[]>();
+  for (const ind of (individualesData ?? []) as IndividualRow[]) {
+    const marcador = [
+      [ind.set1_local, ind.set1_visitante],
+      [ind.set2_local, ind.set2_visitante],
+      [ind.tb_local, ind.tb_visitante],
+    ]
+      .filter(([l, v]) => l !== null && v !== null)
+      .map(([l, v]) => `${l}-${v}`)
+      .join(" ");
+
+    if (!marcador) continue;
+    parcialesPorPartido.set(ind.partido_id, [
+      ...(parcialesPorPartido.get(ind.partido_id) ?? []),
+      marcador,
+    ]);
+  }
 
   return (
     <div className="flex flex-col gap-8">
@@ -122,6 +168,12 @@ export default async function FixturePage({
                   <span className={`rounded px-2 py-0.5 text-xs ${estadoClasses(p.estado)}`}>
                     {ESTADO_LABEL[p.estado] ?? p.estado}
                   </span>
+
+                  {!!parcialesPorPartido.get(p.id)?.length && (
+                    <span className="w-full text-xs text-azul-noche/50">
+                      {parcialesPorPartido.get(p.id)!.join("  ·  ")}
+                    </span>
+                  )}
                 </div>
               ))}
               {!partidosFecha.length && (
