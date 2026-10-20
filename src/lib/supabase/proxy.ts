@@ -44,9 +44,19 @@ export async function updateSession(request: NextRequest) {
   if (user && (isAdminRoute || isCapitanRoute)) {
     const { data: usuario } = await supabase
       .from("usuario")
-      .select("rol")
+      .select("rol, debe_cambiar_password")
       .eq("id", user.id)
       .single();
+
+    // La contraseña que mandamos por mail se deduce del nombre del club, así
+    // que sólo sirve para entrar una vez: hasta que elija una propia no puede
+    // cargar ni confirmar nada.
+    if (usuario?.debe_cambiar_password) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/cuenta";
+      url.searchParams.set("inicial", "1");
+      return NextResponse.redirect(url);
+    }
 
     if (isAdminRoute && usuario?.rol !== "admin") {
       const url = request.nextUrl.clone();

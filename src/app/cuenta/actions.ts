@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 export type CambiarPasswordState = {
@@ -22,11 +23,21 @@ export async function cambiarPassword(
   }
 
   const supabase = await createClient();
+  const { data: sesion } = await supabase.auth.getUser();
   const { error } = await supabase.auth.updateUser({ password });
 
   if (error) {
     return { error: error.message };
   }
 
+  // Ya eligió una propia: se levanta el bloqueo que lo obligaba a pasar por acá.
+  if (sesion.user) {
+    await supabase
+      .from("usuario")
+      .update({ debe_cambiar_password: false })
+      .eq("id", sesion.user.id);
+  }
+
+  revalidatePath("/", "layout");
   return { success: true };
 }
