@@ -226,3 +226,49 @@ export async function notificarRecuperacion({
     console.error("No se pudo enviar el link de recuperación vía GHL:", err);
   }
 }
+
+// Aviso semanal al admin con los partidos cuya fecha ya pasó y siguen sin
+// resultado. La app no le avisa nada al capitán local cuando le toca cargar,
+// así que sin esto un partido olvidado queda en "programado" para siempre y
+// nadie se entera.
+export async function notificarPendientes({
+  email,
+  pendientes,
+  urlAdmin,
+}: {
+  email: string;
+  pendientes: {
+    fechaNumero: number;
+    jugadoEl: string;
+    local: string;
+    visitante: string;
+    capitanLocal: string;
+  }[];
+  urlAdmin: string;
+}) {
+  if (!pendientes.length) return;
+
+  try {
+    const contactId = await upsertContacto(email);
+    const filas = pendientes
+      .map(
+        (p) =>
+          `<li>Fecha ${p.fechaNumero} (${p.jugadoEl}) — <strong>${p.local}</strong> vs ${p.visitante}.
+           Carga: ${p.capitanLocal}</li>`,
+      )
+      .join("");
+
+    await enviarEmail(
+      contactId,
+      `CAP: ${pendientes.length} partido${pendientes.length > 1 ? "s" : ""} sin cargar`,
+      `<p>Estos partidos ya se jugaron y todavía no tienen resultado cargado:</p>
+       <ul>${filas}</ul>
+       <p>El que carga es siempre el capitán del equipo local. Si no lo hace,
+       el visitante tampoco recibe el aviso para confirmar.</p>
+       <p><a href="${urlAdmin}">${urlAdmin}</a></p>
+       <p>— CAP, Circuito Abierto de Pádel</p>`,
+    );
+  } catch (err) {
+    console.error("No se pudo enviar el aviso de pendientes vía GHL:", err);
+  }
+}
