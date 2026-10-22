@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ESTADO_LABEL, estadoClasses } from "@/lib/brand";
 import { SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { linkMapa } from "@/lib/mapa";
 
 type EquipoRef = { id: string; nombre: string } | null;
 
@@ -31,7 +32,7 @@ type PartidoRow = {
   sets_local: number | null;
   sets_visitante: number | null;
   fecha_id: string;
-  club: { nombre: string; sede: string | null } | null;
+  club: { nombre: string; sede: string | null; direccion: string | null } | null;
   equipo_local: EquipoRef;
   equipo_visitante: EquipoRef;
 };
@@ -80,7 +81,7 @@ export default async function FixturePage({
     ? await supabase
         .from("partido")
         .select(
-          "id, estado, sets_local, sets_visitante, fecha_id, club:club_sede_id (nombre, sede), equipo_local:equipo_local_id (id, nombre), equipo_visitante:equipo_visitante_id (id, nombre)",
+          "id, estado, sets_local, sets_visitante, fecha_id, club:club_sede_id (nombre, sede, direccion), equipo_local:equipo_local_id (id, nombre), equipo_visitante:equipo_visitante_id (id, nombre)",
         )
         .in("fecha_id", fechaIds)
     : { data: [] as PartidoRow[] };
@@ -200,7 +201,22 @@ export default async function FixturePage({
                       Oro y los tres equipos de Padel Generativo en Life Padel. */}
                   <span className="text-azul-noche/70">
                     <span className="sm:hidden">Se juega en: </span>
-                    {p.club?.sede || p.club?.nombre}
+                    {(() => {
+                      const cancha = p.club?.sede || p.club?.nombre || "";
+                      const mapa = linkMapa(cancha, p.club?.direccion ?? null);
+                      return mapa ? (
+                        <a
+                          href={mapa}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline decoration-azul-noche/20 underline-offset-2 hover:text-naranja hover:decoration-naranja"
+                        >
+                          {cancha}
+                        </a>
+                      ) : (
+                        cancha
+                      );
+                    })()}
                   </span>
 
                   <span

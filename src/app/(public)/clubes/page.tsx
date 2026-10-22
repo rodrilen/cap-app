@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { colorCategoria } from "@/lib/brand";
+import { linkMapa } from "@/lib/mapa";
 import { MOSTRAR_CLUBES, SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 type Jugador = { id: string; nombre: string };
@@ -59,7 +60,16 @@ export default async function ClubesPage() {
               </p>
             )}
             <p className="mt-0.5 text-sm text-azul-noche/70">
-              {club.direccion ?? (
+              {club.direccion ? (
+                <a
+                  href={linkMapa(club.sede ?? club.nombre, club.direccion)!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-azul-noche/20 underline-offset-2 hover:text-naranja hover:decoration-naranja"
+                >
+                  {club.direccion}
+                </a>
+              ) : (
                 <span className="text-azul-noche/40">Dirección a confirmar</span>
               )}
             </p>
