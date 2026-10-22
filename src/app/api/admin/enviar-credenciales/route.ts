@@ -61,10 +61,16 @@ export async function POST(request: NextRequest) {
   );
   const destinatarios = (capitanes ?? []).filter((c) => c.equipo_id);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
   if (!enviar) {
     return NextResponse.json({
       dryRun: true,
       total: destinatarios.length,
+      // El link que va a llevar el mail. Se muestra acá porque sale de una
+      // variable de entorno: si quedó la URL vieja, esto lo canta antes de
+      // mandar 8 mails con un link equivocado.
+      urlLogin: `${siteUrl}/login`,
       destinatarios: destinatarios.map((c) => {
         const d = porEquipo.get(c.equipo_id!);
         return {
@@ -76,7 +82,6 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const enviados: string[] = [];
   const fallidos: { email: string; motivo: string }[] = [];
 
