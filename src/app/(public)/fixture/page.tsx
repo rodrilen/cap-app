@@ -147,7 +147,7 @@ export default async function FixturePage({
       <p className="-mt-4 text-sm text-azul-noche/70">
         En cada cruce, el primero es el <strong className="font-semibold">local</strong>:
         es el que pone la cancha y el que carga el resultado. La cancha puede no
-        ser la suya — la fecha 1 se juega entera en Punta de Oro.
+        ser la suya — la fecha 1 se juega entera en Punto de Oro.
       </p>
 
       {fechas?.map((fecha) => {
