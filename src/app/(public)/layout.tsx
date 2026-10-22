@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getUsuarioActual } from "@/lib/auth/current-user";
-import { SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { MOSTRAR_CLUBES, SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 export default async function PublicLayout({
   children,
@@ -39,10 +39,12 @@ export default async function PublicLayout({
               <Link href="/ranking" className="hover:text-naranja">
                 Rankings
               </Link>
-              <Link href="/clubes" className="hover:text-naranja">
-                Clubes
-              </Link>
             </>
+          )}
+          {MOSTRAR_CLUBES && (
+            <Link href="/clubes" className="hover:text-naranja">
+              Clubes
+            </Link>
           )}
           {panel ? (
             <Link href={panel.href} className="font-semibold hover:text-naranja">

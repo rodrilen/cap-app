@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { MOSTRAR_CLUBES, SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 export default function HomePage() {
   return (
@@ -50,18 +50,22 @@ export default function HomePage() {
                 Puntos por jugador y ranking general de equipos.
               </p>
             </Link>
-            <Link
-              href="/clubes"
-              className="rounded border border-azul-noche/10 bg-white p-4 transition-colors hover:border-naranja"
-            >
-              <h2 className="font-semibold text-azul-noche">
-                Clubes y jugadores
-              </h2>
-              <p className="mt-1 text-sm text-azul-noche/70">
-                Qué equipos y jugadores representan a cada club.
-              </p>
-            </Link>
           </>
+        )}
+        {MOSTRAR_CLUBES && (
+          <Link
+            href="/clubes"
+            className="rounded border border-azul-noche/10 bg-white p-4 transition-colors hover:border-naranja"
+          >
+            <h2 className="font-semibold text-azul-noche">
+              {SECCIONES_COMPLETAS ? "Clubes y jugadores" : "Clubes y canchas"}
+            </h2>
+            <p className="mt-1 text-sm text-azul-noche/70">
+              {SECCIONES_COMPLETAS
+                ? "Qué equipos y jugadores representan a cada club."
+                : "Dónde queda cada club y qué equipos presenta."}
+            </p>
+          </Link>
         )}
       </div>
     </div>

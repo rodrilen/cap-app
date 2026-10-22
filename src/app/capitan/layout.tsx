@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { logout } from "@/app/login/actions";
-import { SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { MOSTRAR_CLUBES, SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 export default function CapitanLayout({
   children,
@@ -28,10 +28,12 @@ export default function CapitanLayout({
                 <Link href="/ranking" className="hover:text-naranja">
                   Rankings
                 </Link>
-                <Link href="/clubes" className="hover:text-naranja">
-                  Clubes
-                </Link>
               </>
+            )}
+            {MOSTRAR_CLUBES && (
+              <Link href="/clubes" className="hover:text-naranja">
+                Clubes
+              </Link>
             )}
           </nav>
         </div>

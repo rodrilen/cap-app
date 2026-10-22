@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { colorCategoria } from "@/lib/brand";
-import { SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { MOSTRAR_CLUBES, SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 type Jugador = { id: string; nombre: string };
 type Equipo = {
@@ -14,19 +14,20 @@ type Equipo = {
 type Club = {
   id: string;
   nombre: string;
+  sede: string | null;
   direccion: string | null;
   equipo: Equipo[];
 };
 
 export default async function ClubesPage() {
-  // Oculta mientras SECCIONES_COMPLETAS esté en false (ver src/lib/secciones.ts).
-  if (!SECCIONES_COMPLETAS) notFound();
+  // Oculta mientras MOSTRAR_CLUBES esté en false (ver src/lib/secciones.ts).
+  if (!MOSTRAR_CLUBES) notFound();
 
   const supabase = await createClient();
   const { data: clubesData } = await supabase
     .from("club")
     .select(
-      "id, nombre, direccion, equipo:equipo (id, nombre, categoria:categoria_id (nombre), jugador:jugador (id, nombre))",
+      "id, nombre, sede, direccion, equipo:equipo (id, nombre, categoria:categoria_id (nombre), jugador:jugador (id, nombre))",
     )
     .order("nombre");
 
@@ -36,10 +37,12 @@ export default async function ClubesPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-black uppercase tracking-tight text-azul-noche">
-          Clubes y jugadores
+          {SECCIONES_COMPLETAS ? "Clubes y jugadores" : "Clubes y canchas"}
         </h1>
         <p className="mt-1 text-sm text-azul-noche/70">
-          Los equipos y jugadores que representan a cada club.
+          {SECCIONES_COMPLETAS
+            ? "Los equipos y jugadores que representan a cada club."
+            : "Dónde juega de local cada club y qué equipos presenta."}
         </p>
       </div>
 
@@ -47,20 +50,36 @@ export default async function ClubesPage() {
         {clubes.map((club) => (
           <div key={club.id} className="rounded border border-azul-noche/10 bg-white p-4">
             <h2 className="font-semibold text-azul-noche">{club.nombre}</h2>
-            {club.direccion && (
-              <p className="mt-1 text-sm text-azul-noche/70">{club.direccion}</p>
+
+            {/* La cancha sólo se aclara cuando no se llama igual que el club,
+                para no repetir "Pintados — Pintados". */}
+            {club.sede && (
+              <p className="mt-1 text-sm text-azul-noche">
+                Juega en <strong className="font-semibold">{club.sede}</strong>
+              </p>
             )}
+            <p className="mt-0.5 text-sm text-azul-noche/70">
+              {club.direccion ?? (
+                <span className="text-azul-noche/40">Dirección a confirmar</span>
+              )}
+            </p>
 
             <div className="mt-3 flex flex-col gap-2">
               {club.equipo.map((equipo) => (
                 <div key={equipo.id} className="flex flex-col gap-1 border-t border-azul-noche/10 pt-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Link
-                      href={`/equipos/${equipo.id}`}
-                      className="text-sm font-medium text-azul-noche hover:underline"
-                    >
-                      {equipo.nombre}
-                    </Link>
+                    {SECCIONES_COMPLETAS ? (
+                      <Link
+                        href={`/equipos/${equipo.id}`}
+                        className="text-sm font-medium text-azul-noche hover:underline"
+                      >
+                        {equipo.nombre}
+                      </Link>
+                    ) : (
+                      <span className="text-sm font-medium text-azul-noche">
+                        {equipo.nombre}
+                      </span>
+                    )}
                     {equipo.categoria && (
                       <span
                         className={`rounded px-2 py-0.5 text-xs font-medium ${colorCategoria(equipo.categoria.nombre)}`}
@@ -69,11 +88,13 @@ export default async function ClubesPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-azul-noche/70">
-                    {equipo.jugador.length
-                      ? equipo.jugador.map((j) => j.nombre).join(", ")
-                      : "Sin jugadores cargados."}
-                  </p>
+                  {SECCIONES_COMPLETAS && (
+                    <p className="text-sm text-azul-noche/70">
+                      {equipo.jugador.length
+                        ? equipo.jugador.map((j) => j.nombre).join(", ")
+                        : "Sin jugadores cargados."}
+                    </p>
+                  )}
                 </div>
               ))}
               {!club.equipo.length && (

@@ -5,6 +5,14 @@ import { SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 type EquipoRef = { id: string; nombre: string } | null;
 
+// El encabezado y cada partido comparten este reparto de columnas, que es lo
+// que mantiene la cancha y el estado alineados de fila a fila. Antes era un
+// flex con justify-between y cada fila caía en un lugar distinto según lo
+// largo que fuera el nombre de los equipos.
+//
+// En el teléfono no hay columnas: se apila todo y cada dato lleva su etiqueta.
+const COLUMNAS = "grid grid-cols-1 gap-x-4 sm:grid-cols-[1fr_11rem_7.5rem]";
+
 // Con las fichas de equipo ocultas el nombre no puede ser un link: llevaría a
 // un 404. Ver src/lib/secciones.ts.
 function NombreEquipo({ equipo }: { equipo: EquipoRef }) {
@@ -139,6 +147,12 @@ export default async function FixturePage({
         )}
       </div>
 
+      <p className="-mt-4 text-sm text-azul-noche/70">
+        En cada cruce, el primero es el <strong className="font-semibold">local</strong>:
+        es el que pone la cancha y el que carga el resultado. La cancha puede no
+        ser la suya — la fecha 1 se juega entera en Punta de Oro.
+      </p>
+
       {fechas?.map((fecha) => {
         const partidosFecha = partidos.filter((p) => p.fecha_id === fecha.id);
         return (
@@ -153,11 +167,22 @@ export default async function FixturePage({
                 {fecha.etapa !== "liga" && ` — ${fecha.etapa}`}
               </span>
             </h2>
+
+            {/* Encabezado de columnas, sólo de tablet para arriba: en el
+                teléfono cada partido se apila y lleva su propia etiqueta. */}
+            {!!partidosFecha.length && (
+              <div className={`${COLUMNAS} hidden px-3 text-xs font-medium uppercase tracking-wide text-azul-noche/40 sm:grid`}>
+                <span>Local vs Visitante</span>
+                <span>Dónde se juega</span>
+                <span>Estado</span>
+              </div>
+            )}
+
             <div className="flex flex-col gap-2">
               {partidosFecha.map((p) => (
                 <div
                   key={p.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded border border-azul-noche/10 bg-white p-3 text-sm"
+                  className={`${COLUMNAS} gap-1 rounded border border-azul-noche/10 bg-white p-3 text-sm sm:items-center`}
                 >
                   <span>
                     <NombreEquipo equipo={p.equipo_local} />{" "}
@@ -170,17 +195,22 @@ export default async function FixturePage({
                     )}{" "}
                     <NombreEquipo equipo={p.equipo_visitante} />
                   </span>
-                  {/* La cancha, no el club: Pintados juega en Punta de Oro y
-                      los tres equipos de Padel Generativo en Life Padel. */}
+
+                  {/* La cancha, no el club del local: Pintados juega en Punta de
+                      Oro y los tres equipos de Padel Generativo en Life Padel. */}
                   <span className="text-azul-noche/70">
+                    <span className="sm:hidden">Se juega en: </span>
                     {p.club?.sede || p.club?.nombre}
                   </span>
-                  <span className={`rounded px-2 py-0.5 text-xs ${estadoClasses(p.estado)}`}>
+
+                  <span
+                    className={`w-fit rounded px-2 py-0.5 text-xs ${estadoClasses(p.estado)}`}
+                  >
                     {ESTADO_LABEL[p.estado] ?? p.estado}
                   </span>
 
                   {!!parcialesPorPartido.get(p.id)?.length && (
-                    <span className="w-full text-xs text-azul-noche/70">
+                    <span className="text-xs text-azul-noche/70 sm:col-span-3">
                       {parcialesPorPartido.get(p.id)!.join("  ·  ")}
                     </span>
                   )}
