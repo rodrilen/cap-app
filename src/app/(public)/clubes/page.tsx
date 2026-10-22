@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { colorCategoria } from "@/lib/brand";
+import { SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 type Jugador = { id: string; nombre: string };
 type Equipo = {
@@ -17,6 +19,9 @@ type Club = {
 };
 
 export default async function ClubesPage() {
+  // Oculta mientras SECCIONES_COMPLETAS esté en false (ver src/lib/secciones.ts).
+  if (!SECCIONES_COMPLETAS) notFound();
+
   const supabase = await createClient();
   const { data: clubesData } = await supabase
     .from("club")

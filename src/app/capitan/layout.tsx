@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { logout } from "@/app/login/actions";
+import { SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 export default function CapitanLayout({
   children,
@@ -19,15 +20,19 @@ export default function CapitanLayout({
             <Link href="/fixture" className="hover:text-naranja">
               Fixture
             </Link>
-            <Link href="/tabla" className="hover:text-naranja">
-              Tabla
-            </Link>
-            <Link href="/ranking" className="hover:text-naranja">
-              Rankings
-            </Link>
-            <Link href="/clubes" className="hover:text-naranja">
-              Clubes
-            </Link>
+            {SECCIONES_COMPLETAS && (
+              <>
+                <Link href="/tabla" className="hover:text-naranja">
+                  Tabla
+                </Link>
+                <Link href="/ranking" className="hover:text-naranja">
+                  Rankings
+                </Link>
+                <Link href="/clubes" className="hover:text-naranja">
+                  Clubes
+                </Link>
+              </>
+            )}
           </nav>
         </div>
         <div className="flex items-center gap-4">

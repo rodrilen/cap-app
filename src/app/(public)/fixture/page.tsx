@@ -1,8 +1,21 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ESTADO_LABEL, estadoClasses } from "@/lib/brand";
+import { SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 type EquipoRef = { id: string; nombre: string } | null;
+
+// Con las fichas de equipo ocultas el nombre no puede ser un link: llevaría a
+// un 404. Ver src/lib/secciones.ts.
+function NombreEquipo({ equipo }: { equipo: EquipoRef }) {
+  if (!equipo) return null;
+  if (!SECCIONES_COMPLETAS) return <>{equipo.nombre}</>;
+  return (
+    <Link href={`/equipos/${equipo.id}`} className="hover:underline">
+      {equipo.nombre}
+    </Link>
+  );
+}
 
 type PartidoRow = {
   id: string;
@@ -147,9 +160,7 @@ export default async function FixturePage({
                   className="flex flex-wrap items-center justify-between gap-2 rounded border border-azul-noche/10 bg-white p-3 text-sm"
                 >
                   <span>
-                    <Link href={`/equipos/${p.equipo_local?.id}`} className="hover:underline">
-                      {p.equipo_local?.nombre}
-                    </Link>{" "}
+                    <NombreEquipo equipo={p.equipo_local} />{" "}
                     {p.estado === "confirmado" || p.estado === "walkover" ? (
                       <strong>
                         {p.sets_local} - {p.sets_visitante}
@@ -157,12 +168,7 @@ export default async function FixturePage({
                     ) : (
                       "vs"
                     )}{" "}
-                    <Link
-                      href={`/equipos/${p.equipo_visitante?.id}`}
-                      className="hover:underline"
-                    >
-                      {p.equipo_visitante?.nombre}
-                    </Link>
+                    <NombreEquipo equipo={p.equipo_visitante} />
                   </span>
                   <span className="text-azul-noche/70">{p.club?.nombre}</span>
                   <span className={`rounded px-2 py-0.5 text-xs ${estadoClasses(p.estado)}`}>

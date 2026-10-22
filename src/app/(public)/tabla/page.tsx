@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 type FilaTabla = {
   equipo_id: string;
@@ -18,6 +20,9 @@ export default async function TablaPage({
 }: {
   searchParams: Promise<{ categoria?: string }>;
 }) {
+  // Oculta mientras SECCIONES_COMPLETAS esté en false (ver src/lib/secciones.ts).
+  if (!SECCIONES_COMPLETAS) notFound();
+
   const { categoria } = await searchParams;
   const supabase = await createClient();
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ESTADO_LABEL, colorCategoria, estadoClasses } from "@/lib/brand";
+import { SECCIONES_COMPLETAS } from "@/lib/secciones";
 
 type EquipoRef = { id: string; nombre: string } | null;
 
@@ -21,6 +22,9 @@ export default async function FichaEquipoPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  // Oculta mientras SECCIONES_COMPLETAS esté en false (ver src/lib/secciones.ts).
+  if (!SECCIONES_COMPLETAS) notFound();
+
   const { id } = await params;
   const supabase = await createClient();
 
