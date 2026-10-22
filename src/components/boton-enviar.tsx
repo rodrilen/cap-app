@@ -2,8 +2,9 @@
 
 import { useFormStatus } from "react-dom";
 
-// Confirmar y disputar hablan con la base y mandan mails: en 4G eso tarda
-// varios segundos sin ninguna señal, y el capitán vuelve a tocar.
+// Todo formulario que habla con el servidor tarda: en 4G eso son varios
+// segundos sin ninguna señal, y la reacción natural es volver a tocar el
+// botón. Esto lo deshabilita mientras va y avisa qué está pasando.
 export function BotonEnviar({
   children,
   textoPendiente,

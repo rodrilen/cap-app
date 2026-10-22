@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BotonEnviar } from "@/components/boton-enviar";
 import { login } from "./actions";
 
 export default async function LoginPage({
@@ -44,12 +45,12 @@ export default async function LoginPage({
               className="min-h-11 rounded border border-azul-noche/20 bg-white px-3 text-base"
             />
           </label>
-          <button
-            type="submit"
+          <BotonEnviar
+            textoPendiente="Ingresando…"
             className="min-h-11 rounded bg-naranja px-4 font-medium text-azul-noche hover:opacity-90"
           >
             Ingresar
-          </button>
+          </BotonEnviar>
         </form>
         <Link
           href="/recuperar"

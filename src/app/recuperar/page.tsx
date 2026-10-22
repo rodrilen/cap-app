@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BotonEnviar } from "@/components/boton-enviar";
 import { pedirRecuperacion } from "./actions";
 import { linkWhatsapp } from "@/lib/contacto";
 
@@ -55,12 +56,12 @@ export default async function RecuperarPage({
                   className="min-h-11 rounded border border-azul-noche/20 bg-white px-3 text-base"
                 />
               </label>
-              <button
-                type="submit"
+              <BotonEnviar
+                textoPendiente="Mandando…"
                 className="min-h-11 rounded bg-naranja px-4 font-medium text-azul-noche hover:opacity-90"
               >
                 Mandarme el link
-              </button>
+              </BotonEnviar>
             </form>
           </>
         )}

@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getUsuarioActual } from "@/lib/auth/current-user";
 import { confirmarResultado, disputarResultado, marcarNotificacionLeida } from "./actions";
 import { CargarResultadoForm } from "./cargar-resultado-form";
-import { BotonEnviar } from "./boton-enviar";
+import { BotonEnviar } from "@/components/boton-enviar";
 import { linkWhatsapp } from "@/lib/contacto";
 import { ESTADO_LABEL, estadoClasses } from "@/lib/brand";
 
@@ -195,9 +195,12 @@ export default async function CapitanHomePage({
                   {partido?.equipo_local?.nombre} vs {partido?.equipo_visitante?.nombre}:
                   resultado cargado, esperando tu confirmación.
                 </span>
-                <button type="submit" className="text-amber-700 hover:underline">
+                <BotonEnviar
+                  textoPendiente="Marcando…"
+                  className="shrink-0 text-amber-700 hover:underline"
+                >
                   Marcar como leída
-                </button>
+                </BotonEnviar>
               </form>
             );
           })}

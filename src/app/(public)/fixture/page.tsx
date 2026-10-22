@@ -69,24 +69,20 @@ export default async function FixturePage({
     return <p className="text-zinc-600">Todavía no hay categorías activas.</p>;
   }
 
+  // Fechas y partidos vienen juntos en una sola consulta. Antes eran dos
+  // encadenadas (traer las fechas, sacar sus ids, pedir los partidos), y cada
+  // ida y vuelta a Supabase cuesta ~300 ms desde la función de Vercel.
   const { data: fechas } = await supabase
     .from("fecha")
-    .select("id, numero, fecha_programada, etapa")
+    .select(
+      "id, numero, fecha_programada, etapa, partido:partido (id, estado, sets_local, sets_visitante, fecha_id, club:club_sede_id (nombre, sede, direccion), equipo_local:equipo_local_id (id, nombre), equipo_visitante:equipo_visitante_id (id, nombre))",
+    )
     .eq("categoria_id", categoriaSeleccionada.id)
     .order("numero");
 
-  const fechaIds = fechas?.map((f) => f.id) ?? [];
-
-  const { data: partidosData } = fechaIds.length
-    ? await supabase
-        .from("partido")
-        .select(
-          "id, estado, sets_local, sets_visitante, fecha_id, club:club_sede_id (nombre, sede, direccion), equipo_local:equipo_local_id (id, nombre), equipo_visitante:equipo_visitante_id (id, nombre)",
-        )
-        .in("fecha_id", fechaIds)
-    : { data: [] as PartidoRow[] };
-
-  const partidos = (partidosData ?? []) as unknown as PartidoRow[];
+  const partidos = (fechas ?? []).flatMap(
+    (f) => (f.partido ?? []) as unknown as PartidoRow[],
+  );
 
   // El "2 - 0" del encuentro cuenta partidos individuales ganados, no games:
   // sin los parciales no se puede saber si fue una paliza o se definió en el
