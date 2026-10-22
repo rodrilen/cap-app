@@ -20,7 +20,8 @@ type PartidoRow = {
   games_local: number | null;
   games_visitante: number | null;
   fecha: { numero: number } | null;
-  club: NombreRef;
+  // `sede` es el nombre de la cancha cuando no coincide con el del club.
+  club: { nombre: string; sede: string | null } | null;
   equipo_local: NombreRef;
   equipo_visitante: NombreRef;
 };
@@ -33,7 +34,7 @@ export default async function AdminPartidosPage() {
       supabase
         .from("partido")
         .select(
-          "id, estado, sets_local, sets_visitante, games_local, games_visitante, fecha:fecha_id (numero), club:club_sede_id (nombre), equipo_local:equipo_local_id (nombre), equipo_visitante:equipo_visitante_id (nombre)",
+          "id, estado, sets_local, sets_visitante, games_local, games_visitante, fecha:fecha_id (numero), club:club_sede_id (nombre, sede), equipo_local:equipo_local_id (nombre), equipo_visitante:equipo_visitante_id (nombre)",
         ),
       supabase.from("fecha").select("id, numero").order("numero"),
       supabase.from("equipo").select("id, nombre").order("nombre"),
@@ -65,7 +66,7 @@ export default async function AdminPartidosPage() {
             <input type="hidden" name="id" value={p.id} />
             <span className="w-full text-sm text-zinc-600 sm:w-auto">
               Fecha {p.fecha?.numero} — {p.equipo_local?.nombre} vs{" "}
-              {p.equipo_visitante?.nombre} ({p.club?.nombre})
+              {p.equipo_visitante?.nombre} ({p.club?.sede || p.club?.nombre})
             </span>
             {/* El placeholder desaparece al cargar el valor y quedaban cuatro
                 números sueltos sin forma de saber cuál era cuál. */}

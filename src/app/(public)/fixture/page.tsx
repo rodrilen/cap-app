@@ -23,7 +23,7 @@ type PartidoRow = {
   sets_local: number | null;
   sets_visitante: number | null;
   fecha_id: string;
-  club: { nombre: string } | null;
+  club: { nombre: string; sede: string | null } | null;
   equipo_local: EquipoRef;
   equipo_visitante: EquipoRef;
 };
@@ -72,7 +72,7 @@ export default async function FixturePage({
     ? await supabase
         .from("partido")
         .select(
-          "id, estado, sets_local, sets_visitante, fecha_id, club:club_sede_id (nombre), equipo_local:equipo_local_id (id, nombre), equipo_visitante:equipo_visitante_id (id, nombre)",
+          "id, estado, sets_local, sets_visitante, fecha_id, club:club_sede_id (nombre, sede), equipo_local:equipo_local_id (id, nombre), equipo_visitante:equipo_visitante_id (id, nombre)",
         )
         .in("fecha_id", fechaIds)
     : { data: [] as PartidoRow[] };
@@ -170,7 +170,11 @@ export default async function FixturePage({
                     )}{" "}
                     <NombreEquipo equipo={p.equipo_visitante} />
                   </span>
-                  <span className="text-azul-noche/70">{p.club?.nombre}</span>
+                  {/* La cancha, no el club: Pintados juega en Punta de Oro y
+                      los tres equipos de Padel Generativo en Life Padel. */}
+                  <span className="text-azul-noche/70">
+                    {p.club?.sede || p.club?.nombre}
+                  </span>
                   <span className={`rounded px-2 py-0.5 text-xs ${estadoClasses(p.estado)}`}>
                     {ESTADO_LABEL[p.estado] ?? p.estado}
                   </span>

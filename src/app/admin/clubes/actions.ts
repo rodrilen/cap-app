@@ -8,6 +8,8 @@ export async function crearClub(formData: FormData) {
   await supabase.from("club").insert({
     nombre: String(formData.get("nombre") ?? ""),
     direccion: String(formData.get("direccion") ?? "") || null,
+    // Vacío = la cancha se llama igual que el club (ver 0007_sede_club.sql).
+    sede: String(formData.get("sede") ?? "") || null,
     es_anfitrion: formData.get("es_anfitrion") === "on",
     contacto: String(formData.get("contacto") ?? "") || null,
   });
@@ -22,6 +24,8 @@ export async function actualizarClub(formData: FormData) {
     .update({
       nombre: String(formData.get("nombre") ?? ""),
       direccion: String(formData.get("direccion") ?? "") || null,
+    // Vacío = la cancha se llama igual que el club (ver 0007_sede_club.sql).
+    sede: String(formData.get("sede") ?? "") || null,
       es_anfitrion: formData.get("es_anfitrion") === "on",
       contacto: String(formData.get("contacto") ?? "") || null,
     })

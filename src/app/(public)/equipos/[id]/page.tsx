@@ -31,7 +31,7 @@ export default async function FichaEquipoPage({
   const { data: equipo } = await supabase
     .from("equipo")
     .select(
-      "id, nombre, color, categoria:categoria_id (nombre), club_sede:club_sede_id (nombre, direccion)",
+      "id, nombre, color, categoria:categoria_id (nombre), club_sede:club_sede_id (nombre, sede, direccion)",
     )
     .eq("id", id)
     .single();
@@ -47,7 +47,7 @@ export default async function FichaEquipoPage({
   const { data: historialData } = await supabase
     .from("partido")
     .select(
-      "id, estado, sets_local, sets_visitante, fecha:fecha_id (numero), club:club_sede_id (nombre), equipo_local:equipo_local_id (id, nombre), equipo_visitante:equipo_visitante_id (id, nombre)",
+      "id, estado, sets_local, sets_visitante, fecha:fecha_id (numero), club:club_sede_id (nombre, sede), equipo_local:equipo_local_id (id, nombre), equipo_visitante:equipo_visitante_id (id, nombre)",
     )
     .or(`equipo_local_id.eq.${id},equipo_visitante_id.eq.${id}`);
 
@@ -62,6 +62,7 @@ export default async function FichaEquipoPage({
   )?.nombre;
   const clubSede = equipo.club_sede as unknown as {
     nombre: string;
+    sede: string | null;
     direccion: string | null;
   } | null;
 
@@ -80,7 +81,7 @@ export default async function FichaEquipoPage({
         )}
       </div>
       <p className="-mt-6 text-sm text-azul-noche/70">
-        Sede: {clubSede?.nombre}
+        Sede: {clubSede?.sede || clubSede?.nombre}
         {clubSede?.direccion && ` (${clubSede.direccion})`}
       </p>
 

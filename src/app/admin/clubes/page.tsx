@@ -6,7 +6,7 @@ export default async function ClubesPage() {
   const supabase = await createClient();
   const { data: clubes } = await supabase
     .from("club")
-    .select("id, nombre, direccion, es_anfitrion, contacto")
+    .select("id, nombre, sede, direccion, es_anfitrion, contacto")
     .order("nombre");
 
   return (
@@ -25,6 +25,13 @@ export default async function ClubesPage() {
               name="nombre"
               defaultValue={club.nombre}
               required
+              className="rounded border border-zinc-300 px-2 py-1"
+            />
+            <input
+              name="sede"
+              defaultValue={club.sede ?? ""}
+              placeholder="Cancha (si difiere)"
+              title="Nombre de la cancha donde juega de local. Vacío = se llama igual que el club."
               className="rounded border border-zinc-300 px-2 py-1"
             />
             <input
@@ -65,6 +72,14 @@ export default async function ClubesPage() {
         <label className="flex flex-col gap-1 text-sm">
           Nombre
           <input name="nombre" required className="rounded border border-zinc-300 px-2 py-1" />
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
+          Cancha
+          <input
+            name="sede"
+            placeholder="si difiere del club"
+            className="rounded border border-zinc-300 px-2 py-1"
+          />
         </label>
         <label className="flex flex-col gap-1 text-sm">
           Dirección
