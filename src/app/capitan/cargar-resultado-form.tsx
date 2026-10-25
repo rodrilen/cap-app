@@ -42,10 +42,14 @@ function necesitaTiebreak(sets: Sets) {
   return g1 !== g2;
 }
 
+// El súper tiebreak entra en esta cuenta igual que los sets: si queda
+// empatado, el partido individual no tiene ganador y el servidor terminaría
+// adjudicándoselo al visitante sin avisar.
 function tieneSetEmpatado(sets: Sets) {
   return (
     ganadorDeSet(sets.s1l, sets.s1v) === "empate" ||
-    ganadorDeSet(sets.s2l, sets.s2v) === "empate"
+    ganadorDeSet(sets.s2l, sets.s2v) === "empate" ||
+    ganadorDeSet(sets.tbl, sets.tbv) === "empate"
   );
 }
 
@@ -246,7 +250,8 @@ function BloquePartido({
 
       {empatado && (
         <p className="text-sm text-red-600">
-          Un set no puede terminar empatado. Revisá los games.
+          Ni un set ni el súper tiebreak pueden terminar empatados. Revisá los
+          números.
         </p>
       )}
     </fieldset>

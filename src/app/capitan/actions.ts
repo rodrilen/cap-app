@@ -91,6 +91,21 @@ export async function cargarResultado(
     };
   });
 
+  // Más abajo el encuentro se cierra con `sets_visitante: 2 - setsLocal`, que
+  // le adjudica al visitante todo partido individual que el local no haya
+  // ganado. Si uno quedara 1-1 (por ejemplo con el súper tiebreak cargado
+  // empatado) el visitante se lo llevaría sin que nadie se entere. El
+  // formulario ya no deja mandarlo, pero el resultado de un partido es
+  // demasiado caro para confiar en una sola barrera.
+  const sinGanador = partidosIndividuales.find(
+    (p) => p.fila.sets_local === p.fila.sets_visitante,
+  );
+  if (sinGanador) {
+    return {
+      error: `El partido ${sinGanador.fila.numero} quedó empatado en sets. Si cada pareja ganó uno, cargá el súper tiebreak; no puede terminar empatado.`,
+    };
+  }
+
   const { error } = await supabase
     .from("partido_individual")
     .insert(partidosIndividuales.map((p) => p.fila));
