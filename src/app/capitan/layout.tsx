@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { logout } from "@/app/login/actions";
-import { MOSTRAR_CLUBES, SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { MOSTRAR_CLUBES, MOSTRAR_RANKINGS, MOSTRAR_TABLA } from "@/lib/secciones";
 
 export default function CapitanLayout({
   children,
@@ -20,15 +20,15 @@ export default function CapitanLayout({
             <Link href="/fixture" className="hover:text-naranja">
               Fixture
             </Link>
-            {SECCIONES_COMPLETAS && (
-              <>
-                <Link href="/tabla" className="hover:text-naranja">
-                  Tabla
-                </Link>
-                <Link href="/ranking" className="hover:text-naranja">
-                  Rankings
-                </Link>
-              </>
+            {MOSTRAR_TABLA && (
+              <Link href="/tabla" className="hover:text-naranja">
+                Tabla
+              </Link>
+            )}
+            {MOSTRAR_RANKINGS && (
+              <Link href="/ranking" className="hover:text-naranja">
+                Rankings
+              </Link>
             )}
             {MOSTRAR_CLUBES && (
               <Link href="/clubes" className="hover:text-naranja">

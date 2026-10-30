@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { colorCategoria } from "@/lib/brand";
 import { linkMapa } from "@/lib/mapa";
-import { MOSTRAR_CLUBES, SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { MOSTRAR_CLUBES, MOSTRAR_PLANTELES } from "@/lib/secciones";
 
 type Jugador = { id: string; nombre: string };
 type Equipo = {
@@ -38,10 +38,10 @@ export default async function ClubesPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-black uppercase tracking-tight text-azul-noche">
-          {SECCIONES_COMPLETAS ? "Clubes y jugadores" : "Clubes y canchas"}
+          {MOSTRAR_PLANTELES ? "Clubes y jugadores" : "Clubes y canchas"}
         </h1>
         <p className="mt-1 text-sm text-azul-noche/70">
-          {SECCIONES_COMPLETAS
+          {MOSTRAR_PLANTELES
             ? "Los equipos y jugadores que representan a cada club."
             : "Dónde juega de local cada club y qué equipos presenta."}
         </p>
@@ -78,7 +78,7 @@ export default async function ClubesPage() {
               {club.equipo.map((equipo) => (
                 <div key={equipo.id} className="flex flex-col gap-1 border-t border-azul-noche/10 pt-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    {SECCIONES_COMPLETAS ? (
+                    {MOSTRAR_PLANTELES ? (
                       <Link
                         href={`/equipos/${equipo.id}`}
                         className="text-sm font-medium text-azul-noche hover:underline"
@@ -98,7 +98,7 @@ export default async function ClubesPage() {
                       </span>
                     )}
                   </div>
-                  {SECCIONES_COMPLETAS && (
+                  {MOSTRAR_PLANTELES && (
                     <p className="text-sm text-azul-noche/70">
                       {equipo.jugador.length
                         ? equipo.jugador.map((j) => j.nombre).join(", ")

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getUsuarioActual } from "@/lib/auth/current-user";
-import { MOSTRAR_CLUBES, SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { MOSTRAR_CLUBES, MOSTRAR_RANKINGS, MOSTRAR_TABLA } from "@/lib/secciones";
 
 export default async function PublicLayout({
   children,
@@ -30,16 +30,16 @@ export default async function PublicLayout({
           <Link href="/fixture" className="hover:text-naranja">
             Fixture
           </Link>
-          {SECCIONES_COMPLETAS && (
-            <>
-              <Link href="/tabla" className="hover:text-naranja">
-                <span className="sm:hidden">Tabla</span>
-                <span className="hidden sm:inline">Tabla de posiciones</span>
-              </Link>
-              <Link href="/ranking" className="hover:text-naranja">
-                Rankings
-              </Link>
-            </>
+          {MOSTRAR_TABLA && (
+            <Link href="/tabla" className="hover:text-naranja">
+              <span className="sm:hidden">Tabla</span>
+              <span className="hidden sm:inline">Tabla de posiciones</span>
+            </Link>
+          )}
+          {MOSTRAR_RANKINGS && (
+            <Link href="/ranking" className="hover:text-naranja">
+              Rankings
+            </Link>
           )}
           {MOSTRAR_CLUBES && (
             <Link href="/clubes" className="hover:text-naranja">

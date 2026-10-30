@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { MOSTRAR_PLANTELES, MOSTRAR_TABLA } from "@/lib/secciones";
 
 type FilaTabla = {
   equipo_id: string;
@@ -20,8 +20,8 @@ export default async function TablaPage({
 }: {
   searchParams: Promise<{ categoria?: string }>;
 }) {
-  // Oculta mientras SECCIONES_COMPLETAS esté en false (ver src/lib/secciones.ts).
-  if (!SECCIONES_COMPLETAS) notFound();
+  // Oculta mientras MOSTRAR_TABLA esté en false (ver src/lib/secciones.ts).
+  if (!MOSTRAR_TABLA) notFound();
 
   const { categoria } = await searchParams;
   const supabase = await createClient();
@@ -103,9 +103,15 @@ export default async function TablaPage({
               >
                 <td className="py-2 pr-2 pl-3 text-azul-noche/70">{i + 1}</td>
                 <td className="py-2 pr-2">
-                  <Link href={`/equipos/${fila.equipo_id}`} className="hover:underline">
-                    {fila.equipo_nombre}
-                  </Link>
+                  {/* Con las fichas de equipo apagadas el nombre no puede ser
+                      un link: llevaría a un 404. Ver src/lib/secciones.ts. */}
+                  {MOSTRAR_PLANTELES ? (
+                    <Link href={`/equipos/${fila.equipo_id}`} className="hover:underline">
+                      {fila.equipo_nombre}
+                    </Link>
+                  ) : (
+                    fila.equipo_nombre
+                  )}
                 </td>
                 <td className="py-2 pr-2 text-right">{fila.partidos_jugados}</td>
                 <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.partidos_ganados}</td>

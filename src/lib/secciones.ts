@@ -1,20 +1,28 @@
-// Qué partes de la app pública están visibles mientras el torneo arranca.
+// Qué secciones de la app pública están visibles. Se prenden de a una, a
+// medida que tienen algo que mostrar: arrancamos sólo con el fixture y vamos
+// sumando. Cada una es independiente de las demás.
 //
-// El panel de admin no se ve afectado por nada de esto: ahí se sigue viendo y
-// editando todo.
+// El panel de admin no se ve afectado por nada de esto: ahí se ve todo.
 
-// Tabla de posiciones, rankings, fichas de equipo y planteles.
+// Tabla de posiciones por categoría. Prendida desde la fecha 1, para que cada
+// equipo vea los puntos que va sumando.
 //
-// Siguen apagados hasta que haya resultados: la tabla y los rankings estarían
-// todos en cero, y los planteles no están confirmados (Black Padel A tiene
-// jugadores de relleno y varios nombres llegaron incompletos del formulario).
-//
-// Poner esto en true los devuelve tal como estaban: vuelven los links del
-// menú, las tarjetas de la home, los nombres de equipo clickeables en el
-// fixture y la lista de jugadores de cada equipo en Clubes.
-export const SECCIONES_COMPLETAS = false;
+// Cuenta sólo los partidos confirmados: uno que está esperando la
+// confirmación del visitante todavía no suma. La vista se recalcula en cada
+// consulta, así que al confirmarse aparece solo, sin desplegar nada.
+export const MOSTRAR_TABLA = true;
 
-// Listado de clubes con su cancha y su dirección, para que cada uno sepa
-// adónde tiene que ir a jugar. Va aparte de SECCIONES_COMPLETAS porque esto sí
-// sirve desde el primer día, mientras que los planteles todavía no.
+// Listado de clubes con su cancha y su dirección, para saber adónde ir.
 export const MOSTRAR_CLUBES = true;
+
+// Ranking de jugadores y de equipos. Apagado: el de equipos suma los puntos
+// de posición final, así que recién tiene sentido con la temporada avanzada.
+export const MOSTRAR_RANKINGS = false;
+
+// Fichas de equipo con el plantel, y la lista de jugadores dentro de Clubes.
+// Apagado hasta que los planteles estén confirmados: en Padel Generativo
+// todavía hay nombres sin apellido.
+//
+// Mientras esté apagado, ningún nombre de equipo puede ser un link: llevaría
+// a un 404. Afecta al fixture, a la tabla y a Clubes.
+export const MOSTRAR_PLANTELES = false;

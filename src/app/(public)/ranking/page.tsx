@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { MOSTRAR_RANKINGS } from "@/lib/secciones";
 
 type FilaJugador = {
   jugador_id: string;
@@ -35,8 +35,8 @@ export default async function RankingPage({
 }: {
   searchParams: Promise<{ categoria?: string }>;
 }) {
-  // Oculta mientras SECCIONES_COMPLETAS esté en false (ver src/lib/secciones.ts).
-  if (!SECCIONES_COMPLETAS) notFound();
+  // Oculta mientras MOSTRAR_RANKINGS esté en false (ver src/lib/secciones.ts).
+  if (!MOSTRAR_RANKINGS) notFound();
 
   const { categoria } = await searchParams;
   const supabase = await createClient();

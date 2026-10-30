@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ESTADO_LABEL, estadoClasses } from "@/lib/brand";
-import { SECCIONES_COMPLETAS } from "@/lib/secciones";
+import { MOSTRAR_PLANTELES } from "@/lib/secciones";
 import { linkMapa } from "@/lib/mapa";
 
 type EquipoRef = { id: string; nombre: string } | null;
@@ -18,7 +18,7 @@ const COLUMNAS = "grid grid-cols-1 gap-x-4 sm:grid-cols-[1fr_11rem_7.5rem]";
 // un 404. Ver src/lib/secciones.ts.
 function NombreEquipo({ equipo }: { equipo: EquipoRef }) {
   if (!equipo) return null;
-  if (!SECCIONES_COMPLETAS) return <>{equipo.nombre}</>;
+  if (!MOSTRAR_PLANTELES) return <>{equipo.nombre}</>;
   return (
     <Link href={`/equipos/${equipo.id}`} className="hover:underline">
       {equipo.nombre}
