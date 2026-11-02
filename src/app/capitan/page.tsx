@@ -27,6 +27,16 @@ type IndividualRow = {
 
 // Las filas cargadas antes de que existieran los parciales sólo tienen los
 // sets; para esas se muestra el agregado como antes.
+function formatearFecha(iso: string | undefined) {
+  if (!iso) return "sin fecha";
+  // El T00:00:00 evita que se corra un día: sin él se interpreta como UTC y
+  // en Argentina muestra el día anterior.
+  return new Date(`${iso}T00:00:00`).toLocaleDateString("es-AR", {
+    day: "2-digit",
+    month: "2-digit",
+  });
+}
+
 function marcador(ind: IndividualRow) {
   const parciales = [
     [ind.set1_local, ind.set1_visitante],
@@ -48,7 +58,7 @@ type PartidoRow = {
   equipo_local_id: string;
   equipo_visitante_id: string;
   fecha: { numero: number; fecha_programada: string } | null;
-  club: EquipoRef;
+  club: { nombre: string; sede: string | null } | null;
   equipo_local: EquipoRef;
   equipo_visitante: EquipoRef;
 };
@@ -99,7 +109,7 @@ export default async function CapitanHomePage({
   const { data: partidosData } = await supabase
     .from("partido")
     .select(
-      "id, estado, sets_local, sets_visitante, games_local, games_visitante, equipo_local_id, equipo_visitante_id, fecha:fecha_id (numero, fecha_programada), club:club_sede_id (nombre), equipo_local:equipo_local_id (nombre), equipo_visitante:equipo_visitante_id (nombre)",
+      "id, estado, sets_local, sets_visitante, games_local, games_visitante, equipo_local_id, equipo_visitante_id, fecha:fecha_id (numero, fecha_programada), club:club_sede_id (nombre, sede), equipo_local:equipo_local_id (nombre), equipo_visitante:equipo_visitante_id (nombre)",
     )
     .or(
       `equipo_local_id.eq.${usuario.equipo_id},equipo_visitante_id.eq.${usuario.equipo_id}`,
@@ -217,7 +227,11 @@ export default async function CapitanHomePage({
             <CargarResultadoForm
               key={p.id}
               partidoId={p.id}
-              encabezado={`Fecha ${p.fecha?.numero} — ${p.equipo_local?.nombre} vs ${p.equipo_visitante?.nombre} (${p.club?.nombre})`}
+              // Sin la fecha del calendario, dos equipos que se cruzan dos
+              // veces (ida y vuelta) son indistinguibles acá: en noviembre un
+              // capitán cargó la revancha creyendo que cargaba el partido que
+              // acababa de jugar.
+              encabezado={`Fecha ${p.fecha?.numero} · ${formatearFecha(p.fecha?.fecha_programada)} — ${p.equipo_local?.nombre} vs ${p.equipo_visitante?.nombre} (${p.club?.sede || p.club?.nombre})`}
               jugadoresPropios={jugadoresPropios ?? []}
               jugadoresRivales={jugadoresRivalesPorEquipo.get(p.equipo_visitante_id) ?? []}
               equipoLocalNombre={p.equipo_local?.nombre}
