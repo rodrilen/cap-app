@@ -192,19 +192,33 @@ async function avisarCapitanVisitante(partidoId: string) {
   });
 }
 
+// Confirmar y disputar cierran el encuentro, así que acá no alcanza con
+// mirar `error`: con RLS, un UPDATE que no alcanza ninguna fila permitida
+// termina bien y sin error, sólo que no modifica nada. Por eso se pide
+// `.select()` y se comprueba que haya vuelto la fila.
+//
+// Antes no se comprobaba nada y siempre se redirigía a "confirmado": si la
+// confirmación fallaba, el capitán veía el cartel verde igual y se iba
+// convencido de haberla hecho, mientras el partido seguía pendiente y sin
+// sumar en la tabla. Pasó en la fecha 4 de C5-C6.
 export async function confirmarResultado(formData: FormData) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return;
+  if (!user) redirect("/capitan?error=sesion");
 
   const partidoId = String(formData.get("partido_id"));
 
-  await supabase
+  const { data, error } = await supabase
     .from("partido")
     .update({ estado: "confirmado", confirmado_por: user.id })
-    .eq("id", partidoId);
+    .eq("id", partidoId)
+    // Si alguien ya lo confirmó o disputó mientras tanto, esto no lo pisa.
+    .eq("estado", "pendiente_confirmacion")
+    .select("id");
+
+  if (error || !data?.length) redirect("/capitan?error=confirmar");
 
   revalidatePath("/capitan");
   redirect("/capitan?aviso=confirmado");
@@ -212,9 +226,22 @@ export async function confirmarResultado(formData: FormData) {
 
 export async function disputarResultado(formData: FormData) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/capitan?error=sesion");
+
   const partidoId = String(formData.get("partido_id"));
 
-  await supabase.from("partido").update({ estado: "disputado" }).eq("id", partidoId);
+  const { data, error } = await supabase
+    .from("partido")
+    .update({ estado: "disputado" })
+    .eq("id", partidoId)
+    .eq("estado", "pendiente_confirmacion")
+    .select("id");
+
+  if (error || !data?.length) redirect("/capitan?error=disputar");
+
   const partido = await datosDelPartido(partidoId);
   await avisarAdminDisputa(partido);
 

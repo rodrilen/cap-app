@@ -86,12 +86,20 @@ const AVISOS: Record<string, string> = {
   confirmado: "Resultado confirmado. Ya suma en la tabla de posiciones.",
 };
 
+const ERRORES: Record<string, string> = {
+  sesion: "Se cerró tu sesión. Volvé a entrar e intentá de nuevo.",
+  confirmar:
+    "No se pudo confirmar: puede que el resultado ya esté confirmado o disputado. Recargá la página; si sigue igual, avisanos por WhatsApp.",
+  disputar:
+    "No se pudo disputar: puede que el resultado ya esté confirmado o disputado. Recargá la página; si sigue igual, avisanos por WhatsApp.",
+};
+
 export default async function CapitanHomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ aviso?: string }>;
+  searchParams: Promise<{ aviso?: string; error?: string }>;
 }) {
-  const { aviso } = await searchParams;
+  const { aviso, error } = await searchParams;
   const usuario = await getUsuarioActual();
   if (!usuario) return null;
 
@@ -183,6 +191,12 @@ export default async function CapitanHomePage({
       {aviso && AVISOS[aviso] && (
         <p className="rounded border border-green-300 bg-green-50 p-3 text-sm text-green-800">
           {AVISOS[aviso]}
+        </p>
+      )}
+
+      {error && ERRORES[error] && (
+        <p className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-700">
+          {ERRORES[error]}
         </p>
       )}
 
