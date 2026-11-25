@@ -15,6 +15,9 @@ type FilaTabla = {
   diferencia_games: number;
 };
 
+// El 0 va sin signo: "+0" se lee como un error de redondeo.
+const conSigno = (n: number) => (n > 0 ? `+${n}` : String(n));
+
 export default async function TablaPage({
   searchParams,
 }: {
@@ -90,7 +93,14 @@ export default async function TablaPage({
               <th className="hidden py-2 pr-2 text-right sm:table-cell">PG</th>
               <th className="hidden py-2 pr-2 text-right sm:table-cell">PE</th>
               <th className="hidden py-2 pr-2 text-right sm:table-cell">PP</th>
-              <th className="hidden py-2 pr-2 text-right sm:table-cell">Dif. sets</th>
+              {/* La diferencia de sets se ve también en el teléfono: es el
+                  primer criterio de desempate y los equipos la miran cuando
+                  quedan igualados en puntos. El resto de las columnas sigue
+                  escondida ahí para que la tabla entre a 375px. */}
+              <th className="py-2 pr-2 text-right">
+                <span className="sm:hidden">Sets</span>
+                <span className="hidden sm:inline">Dif. sets</span>
+              </th>
               <th className="hidden py-2 pr-2 text-right sm:table-cell">Dif. games</th>
               <th className="py-2 pr-3 text-right">Pts</th>
             </tr>
@@ -117,8 +127,12 @@ export default async function TablaPage({
                 <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.partidos_ganados}</td>
                 <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.partidos_empatados}</td>
                 <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.partidos_perdidos}</td>
-                <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.diferencia_sets}</td>
-                <td className="hidden py-2 pr-2 text-right sm:table-cell">{fila.diferencia_games}</td>
+                {/* Con signo: un "+2" se lee de un vistazo, un "2" obliga a
+                    compararlo con los de arriba y abajo para entenderlo. */}
+                <td className="py-2 pr-2 text-right">{conSigno(fila.diferencia_sets)}</td>
+                <td className="hidden py-2 pr-2 text-right sm:table-cell">
+                  {conSigno(fila.diferencia_games)}
+                </td>
                 <td className="py-2 pr-3 text-right font-semibold">{fila.puntos}</td>
               </tr>
             ))}
