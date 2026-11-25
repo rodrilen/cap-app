@@ -101,7 +101,6 @@ export default async function TablaPage({
                 <span className="sm:hidden">Sets</span>
                 <span className="hidden sm:inline">Dif. sets</span>
               </th>
-              <th className="hidden py-2 pr-2 text-right sm:table-cell">Dif. games</th>
               <th className="py-2 pr-3 text-right">Pts</th>
             </tr>
           </thead>
@@ -130,15 +129,12 @@ export default async function TablaPage({
                 {/* Con signo: un "+2" se lee de un vistazo, un "2" obliga a
                     compararlo con los de arriba y abajo para entenderlo. */}
                 <td className="py-2 pr-2 text-right">{conSigno(fila.diferencia_sets)}</td>
-                <td className="hidden py-2 pr-2 text-right sm:table-cell">
-                  {conSigno(fila.diferencia_games)}
-                </td>
                 <td className="py-2 pr-3 text-right font-semibold">{fila.puntos}</td>
               </tr>
             ))}
             {!tabla.length && (
               <tr>
-                <td colSpan={9} className="py-4 text-center text-azul-noche/40">
+                <td colSpan={8} className="py-4 text-center text-azul-noche/40">
                   Todavía no hay partidos confirmados.
                 </td>
               </tr>
