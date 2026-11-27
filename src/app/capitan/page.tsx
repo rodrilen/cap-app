@@ -163,16 +163,20 @@ export default async function CapitanHomePage({
 
   const equiposRivalesIds = [...new Set(paraCargar.map((p) => p.equipo_visitante_id))];
   const [{ data: jugadoresPropios }, { data: jugadoresRivalesData }] = await Promise.all([
+    // Solo los activos: un jugador dado de baja sigue existiendo para los
+    // partidos que ya jugo, pero no se puede elegir en uno nuevo.
     supabase
       .from("jugador")
       .select("id, nombre")
       .eq("equipo_id", usuario.equipo_id)
+      .eq("activo", true)
       .order("nombre"),
     equiposRivalesIds.length
       ? supabase
           .from("jugador")
           .select("id, nombre, equipo_id")
           .in("equipo_id", equiposRivalesIds)
+          .eq("activo", true)
           .order("nombre")
       : Promise.resolve({ data: [] as { id: string; nombre: string; equipo_id: string }[] }),
   ]);

@@ -42,6 +42,7 @@ export default async function FichaEquipoPage({
     .from("jugador")
     .select("id, nombre")
     .eq("equipo_id", id)
+    .eq("activo", true)
     .order("nombre");
 
   const { data: historialData } = await supabase

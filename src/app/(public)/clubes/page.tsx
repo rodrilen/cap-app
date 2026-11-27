@@ -5,7 +5,7 @@ import { colorCategoria } from "@/lib/brand";
 import { linkMapa } from "@/lib/mapa";
 import { MOSTRAR_CLUBES, MOSTRAR_PLANTELES } from "@/lib/secciones";
 
-type Jugador = { id: string; nombre: string };
+type Jugador = { id: string; nombre: string; activo: boolean };
 type Equipo = {
   id: string;
   nombre: string;
@@ -28,7 +28,7 @@ export default async function ClubesPage() {
   const { data: clubesData } = await supabase
     .from("club")
     .select(
-      "id, nombre, sede, direccion, equipo:equipo (id, nombre, categoria:categoria_id (nombre), jugador:jugador (id, nombre))",
+      "id, nombre, sede, direccion, equipo:equipo (id, nombre, categoria:categoria_id (nombre), jugador:jugador (id, nombre, activo))",
     )
     .order("nombre");
 
@@ -98,13 +98,20 @@ export default async function ClubesPage() {
                       </span>
                     )}
                   </div>
-                  {MOSTRAR_PLANTELES && (
-                    <p className="text-sm text-azul-noche/70">
-                      {equipo.jugador.length
-                        ? equipo.jugador.map((j) => j.nombre).join(", ")
-                        : "Sin jugadores cargados."}
-                    </p>
-                  )}
+                  {MOSTRAR_PLANTELES &&
+                    (() => {
+                      // El plantel que se publica es el vigente: los dados de
+                      // baja siguen en la base por los partidos que jugaron,
+                      // pero no son parte del equipo de hoy.
+                      const activos = equipo.jugador.filter((j) => j.activo);
+                      return (
+                        <p className="text-sm text-azul-noche/70">
+                          {activos.length
+                            ? activos.map((j) => j.nombre).join(", ")
+                            : "Sin jugadores cargados."}
+                        </p>
+                      );
+                    })()}
                 </div>
               ))}
               {!club.equipo.length && (
